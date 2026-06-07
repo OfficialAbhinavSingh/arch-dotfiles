@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Find a random wallpaper file
+wall=$(find ~/Pictures/wallpapers/ -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
+
+if [ -z "$wall" ]; then
+    echo "No wallpaper found!"
+    exit 1
+fi
+
+# Set wallpaper
+awww img "$wall"
+
+# Generate colors using the config directory
+wallust run -d ~/.config/wallust/ "$wall"
+
+# Refresh UI
+killall -SIGUSR2 waybar
+# Notification
+notify-send "Chameleon" "Theme updated to match $(basename "$wall")" -i "$wall"

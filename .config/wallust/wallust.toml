@@ -1,0 +1,10 @@
+# wallust.toml configuration v3
+
+backend = "full"
+color_space = "lab"
+threshold = 20
+filter = "dark16"
+
+[templates]
+rofi = { src = "rofi.rasi", target = "~/.config/rofi/wallust/colors-rofi.rasi" }
+waybar = { src = "waybar.css", target = "~/.config/waybar/wallust/colors-waybar.css" }

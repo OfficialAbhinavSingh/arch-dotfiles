@@ -1,0 +1,13 @@
+#!/bin/bash
+# 🤖 Local AI Terminal Assistant (Ollama)
+
+MODEL="llama3"
+
+if [ -z "$1" ]; then
+    echo "Usage: ai 'Your question here'"
+    exit 1
+fi
+
+echo "🤔 Thinking..."
+# Use ollama run with the prompt
+ollama run "$MODEL" "$*"
