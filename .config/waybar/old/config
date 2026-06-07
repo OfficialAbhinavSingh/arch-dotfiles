@@ -1,0 +1,49 @@
+/* ---- Waybar Main Config — points to Screenshot layout ---- */
+/* Original backed up to config.bak */
+
+// This file is intentionally minimal — the real config is included below
+// Change the include path to switch layouts
+
+{
+"include": [
+  "$HOME/.config/waybar/Modules",
+  "$HOME/.config/waybar/ModulesWorkspaces",
+  "$HOME/.config/waybar/ModulesCustom",
+  "$HOME/.config/waybar/ModulesGroups",
+  "$HOME/.config/waybar/UserModules"
+  ],
+"layer": "top",
+"exclusive": true,
+"passthrough": false,
+"position": "top",
+"spacing": 4,
+"fixed-center": true,
+"ipc": true,
+"margin-top": 8,
+"margin-left": 15,
+"margin-right": 15,
+
+"modules-left": [
+        "hyprland/workspaces",
+        "cpu",
+        "memory",
+        "disk"
+        ],
+
+"modules-center": [
+        "custom/menu",
+        "temperature#center",
+        "clock",
+        "custom/power"
+        ],
+
+"modules-right": [
+        "temperature",
+        "cpu#right",
+        "disk#right",
+        "battery",
+        "memory#right",
+        "tray",
+        "custom/settings"
+        ]
+}

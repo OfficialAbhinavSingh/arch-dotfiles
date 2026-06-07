@@ -1,0 +1,53 @@
+/* ---- Screenshot Style Waybar Config ---- */
+/* Matches the dark blue/purple anime desktop from the reference screenshot */
+
+{
+"include": [
+  "$HOME/.config/waybar/Modules",
+  "$HOME/.config/waybar/ModulesWorkspaces",
+  "$HOME/.config/waybar/ModulesCustom",
+  "$HOME/.config/waybar/ModulesGroups",
+  "$HOME/.config/waybar/UserModules"
+  ],
+"layer": "top",
+"exclusive": true,
+"passthrough": false,
+"position": "top",
+"spacing": 4,
+"fixed-center": true,
+"ipc": true,
+"margin-top": 6,
+"margin-left": 10,
+"margin-right": 10,
+
+"modules-left": [
+        "hyprland/workspaces",
+        "custom/separator#blank",
+        "custom/cava_mviz",
+        "custom/separator#blank_2",
+        "custom/playerctl"
+        ],
+
+"modules-center": [
+        "custom/separator#blank",
+        "group/notify",
+        "custom/separator#dot",
+        "clock",
+        "custom/separator#dot",
+        "idle_inhibitor"
+        ],
+
+"modules-right": [
+        "tray",
+        "custom/separator#dot-line",
+        "temperature",
+        "custom/separator#dot",
+        "group/laptop",
+        "custom/separator#dot",
+        "group/audio",
+        "custom/separator#dot-line",
+        "network#speed",
+        "custom/separator#dot",
+        "group/status"
+        ]
+}

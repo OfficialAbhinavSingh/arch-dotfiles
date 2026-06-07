@@ -1,0 +1,209 @@
+
+# This config is a STUB! This should never be generated.
+# Use the default lua config from https://github.com/hyprwm/Hyprland/blob/main/example/hyprland.lua
+
+
+$mainMod = SUPER
+$terminal = kitty
+$fileManager = dolphin
+$menu = rofi -show drun -modi run,drun,filebrowser,window
+
+# ── Launchers ───────────────────────────────────────────────────────────────
+bind = $mainMod, Q, exec, $terminal
+bind = $mainMod, C, killactive,
+bind = $mainMod, M, exec, command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit
+bind = $mainMod, E, exec, $fileManager
+bind = $mainMod, V, togglefloating,
+bind = $mainMod, R, exec, $menu
+bind = $mainMod, F, fullscreen, 0
+
+# ── Neofetch / System Info floating window ──────────────────────────────────
+bind = $mainMod, N, exec, kitty --title "neofetch" --override "initial_window_width=520" --override "initial_window_height=360" sh -c "neofetch; read"
+
+# ── Focus movement ───────────────────────────────────────────────────────────
+bind = $mainMod, left, movefocus, l
+bind = $mainMod, right, movefocus, r
+bind = $mainMod, up, movefocus, u
+bind = $mainMod, down, movefocus, d
+bind = $mainMod, H, movefocus, l
+# ── Lockscreen ───────────────────────────────────────────────────────────────
+bind = $mainMod, L, exec, hyprlock
+# bind = $mainMod, L, movefocus, r
+bind = $mainMod, K, movefocus, u
+bind = $mainMod, J, movefocus, d
+
+# ── Workspace switching ──────────────────────────────────────────────────────
+bind = $mainMod, 1, workspace, 1
+bind = $mainMod, 2, workspace, 2
+bind = $mainMod, 3, workspace, 3
+bind = $mainMod, 4, workspace, 4
+bind = $mainMod, 5, workspace, 5
+bind = $mainMod, 6, workspace, 6
+bind = $mainMod, 7, workspace, 7
+bind = $mainMod, 8, workspace, 8
+bind = $mainMod, 9, workspace, 9
+bind = $mainMod, 0, workspace, 10
+
+# ── Move window to workspace ─────────────────────────────────────────────────
+bind = $mainMod SHIFT, 1, movetoworkspace, 1
+bind = $mainMod SHIFT, 2, movetoworkspace, 2
+bind = $mainMod SHIFT, 3, movetoworkspace, 3
+bind = $mainMod SHIFT, 4, movetoworkspace, 4
+bind = $mainMod SHIFT, 5, movetoworkspace, 5
+bind = $mainMod SHIFT, 6, movetoworkspace, 6
+bind = $mainMod SHIFT, 7, movetoworkspace, 7
+bind = $mainMod SHIFT, 8, movetoworkspace, 8
+bind = $mainMod SHIFT, 9, movetoworkspace, 9
+bind = $mainMod SHIFT, 0, movetoworkspace, 10
+
+# ── Mouse workspace scroll ───────────────────────────────────────────────────
+bind = $mainMod, mouse_down, workspace, e+1
+bind = $mainMod, mouse_up,   workspace, e-1
+bindm = $mainMod, mouse:272, movewindow
+bindm = $mainMod, mouse:273, resizewindow
+
+# ── Volume & Brightness (media keys) ────────────────────────────────────────
+bindel = , XF86AudioRaiseVolume,  exec, ~/.config/hypr/scripts/Volume.sh --inc
+bindel = , XF86AudioLowerVolume,  exec, ~/.config/hypr/scripts/Volume.sh --dec
+bindl  = , XF86AudioMute,         exec, ~/.config/hypr/scripts/Volume.sh --toggle
+bindel = , XF86MonBrightnessUp,   exec, ~/.config/hypr/scripts/Brightness.sh --inc
+bindel = , XF86MonBrightnessDown, exec, ~/.config/hypr/scripts/Brightness.sh --dec
+bindel = , XF86KbdBrightnessUp,   exec, brightnessctl -d asus::kbd_backlight set 1+
+bindel = , XF86KbdBrightnessDown, exec, brightnessctl -d asus::kbd_backlight set 1-
+bind = , XF86AudioPlay,         exec, playerctl play-pause
+bind = , XF86AudioNext,         exec, playerctl next
+bind = , XF86AudioPrev,         exec, playerctl previous
+
+# ── Screenshot ───────────────────────────────────────────────────────────────
+bind = , Print,           exec, grim -g "$(slurp)" - | wl-copy
+bind = SHIFT, Print,      exec, grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+general {
+    gaps_in  = 8
+    gaps_out = 18
+
+    border_size = 2
+
+    # Blue→Purple gradient border matching the screenshot style
+    col.active_border   = rgba(89b4faee) rgba(cba6f7ee) 45deg
+    col.inactive_border = rgba(1e1e2e88)
+
+    layout = dwindle
+    resize_on_border = true
+}
+
+decoration {
+    rounding = 18
+
+    # Window opacity (slight transparency like screenshot)
+    active_opacity   = 0.94
+    inactive_opacity = 0.88
+
+    # Drop shadow
+    shadow {
+        enabled      = true
+        range        = 20
+        render_power = 3
+        color        = rgba(0, 0, 0, 0.5)
+        color_inactive = rgba(0, 0, 0, 0.25)
+    }
+
+    blur {
+        enabled        = true
+        size           = 8
+        passes         = 3
+        new_optimizations = true
+        xray           = false
+        noise          = 0.02
+        contrast       = 0.9
+        brightness     = 0.85
+        vibrancy       = 0.18
+        vibrancy_darkness = 0.0
+    }
+}
+
+animations {
+    enabled = true
+
+    # Smooth cubic bezier curves
+    bezier = easeOutQuint,  0.23, 1.0,  0.32, 1.0
+    bezier = easeInOutCubic, 0.65, 0.05, 0.35, 1.0
+    bezier = bounce,         0.05, 0.9,  0.1,  1.05
+    bezier = linear,         0.0,  0.0,  1.0,  1.0
+    bezier = easeOutBack,    0.34, 1.56, 0.64, 1.0
+
+    animation = windows,    1, 5,  easeOutQuint,   slide
+    animation = windowsOut, 1, 4,  easeInOutCubic, slide
+    animation = windowsMove,1, 4,  easeOutBack,    slide
+    animation = fade,       1, 5,  easeOutQuint
+    animation = fadeIn,     1, 4,  easeOutQuint
+    animation = fadeOut,    1, 3,  easeInOutCubic
+    animation = border,     1, 8,  linear
+    animation = borderangle,1, 80, linear, loop
+    animation = workspaces, 1, 5,  easeOutQuint,   slide
+    animation = specialWorkspace, 1, 6, easeOutQuint, slidevert
+}
+
+dwindle {
+    preserve_split = true
+}
+
+master {
+    new_status = master
+}
+
+gestures {
+    # workspace swipe is configured under input:touchpad in newer Hyprland
+}
+
+misc {
+    force_default_wallpaper = 0
+    disable_hyprland_logo   = true
+    disable_splash_rendering = true
+    mouse_move_enables_dpms  = true
+    key_press_enables_dpms   = true
+    animate_manual_resizes   = true
+    animate_mouse_windowdragging = true
+}
+
+input {
+    kb_layout = us
+    follow_mouse = 1
+    sensitivity = 0
+    touchpad {
+        natural_scroll       = true
+        disable_while_typing = true
+        scroll_factor        = 0.8
+    }
+}
+
+# ── Window rules ──────────────────────────────────────────────────────────────
+
+# Neofetch floats in top-right corner like screenshot
+windowrule = match:title ^(neofetch)$, float on
+windowrule = match:title ^(neofetch)$, size 520 360
+windowrule = match:title ^(neofetch)$, move 100%-540 40
+windowrule = match:title ^(neofetch)$, pin on
+windowrule = match:title ^(neofetch)$, opacity 0.92
+
+# Rofi
+windowrule = match:class ^(rofi)$, float on
+windowrule = match:class ^(rofi)$, center on
+
+# Dolphin
+windowrule = match:class ^(dolphin)$, float on
+
+# ── Startup ───────────────────────────────────────────────────────────────────
+exec-once = waybar
+exec-once = swaync
+exec-once = nm-applet
+exec-once = blueman-applet
+exec-once = hyprpaper
+exec-once = awww-daemon
+exec-once = ~/.local/bin/random-wallpaper
+exec-once = wl-paste --type text --watch cliphist store
+exec-once = wl-paste --type image --watch cliphist store
+
+bind = SUPER SHIFT, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy

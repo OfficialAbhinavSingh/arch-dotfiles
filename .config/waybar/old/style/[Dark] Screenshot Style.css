@@ -1,0 +1,463 @@
+/* =====================================================
+   Screenshot Style — Dark Blue/Purple Glass Waybar
+   Inspired by the anime ocean wallpaper setup
+   ===================================================== */
+
+/* --- Color Variables --- */
+@define-color bar-bg         rgba(0, 0, 0, 0);
+@define-color module-bg      rgba(12, 12, 28, 0.88);
+@define-color module-border  rgba(100, 130, 220, 0.22);
+@define-color accent-blue    #89b4fa;
+@define-color accent-purple  #cba6f7;
+@define-color accent-pink    #f5c2e7;
+@define-color accent-teal    #94e2d5;
+@define-color text-main      #cdd6f4;
+@define-color text-dim       #7f849c;
+@define-color text-muted     #45475a;
+@define-color ws-active-bg   rgba(137, 180, 250, 0.18);
+@define-color ws-hover-bg    rgba(203, 166, 247, 0.12);
+
+/* --- Global Reset --- */
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", "Symbols Nerd Font", monospace;
+    font-weight: bold;
+    font-size: 13px;
+    min-height: 0;
+    font-feature-settings: '"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"';
+    transition: all 0.25s ease;
+}
+
+/* --- Bar Window --- */
+window#waybar {
+    background: @bar-bg;
+    color: @text-main;
+}
+
+window#waybar.hidden {
+    opacity: 0.15;
+}
+
+/* --- Tooltip --- */
+tooltip {
+    background: rgba(12, 12, 28, 0.96);
+    color: @text-main;
+    border: 1px solid @module-border;
+    border-radius: 10px;
+    padding: 6px 10px;
+}
+
+tooltip label {
+    color: @text-main;
+}
+
+/* =====================================================
+   MODULE BASE — glass pill style
+   ===================================================== */
+
+#backlight,
+#backlight-slider,
+#battery,
+#bluetooth,
+#clock,
+#cpu,
+#disk,
+#idle_inhibitor,
+#keyboard-state,
+#memory,
+#mode,
+#network,
+#power-profiles-daemon,
+#pulseaudio,
+#pulseaudio-slider,
+#taskbar,
+#temperature,
+#tray,
+#wireplumber,
+.modules-left,
+.modules-center,
+.modules-right {
+    padding: 3px 10px;
+    margin: 3px 2px;
+    background: @module-bg;
+    border: 1px solid @module-border;
+    border-radius: 12px;
+    color: @text-main;
+}
+
+/* --- Taskbar & custom module --- */
+#taskbar {
+    background: @module-bg;
+}
+
+#taskbar button {
+    padding: 0 5px;
+    margin: 0 2px;
+    color: @text-dim;
+    border-radius: 8px;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+#taskbar button.active {
+    color: @accent-blue;
+    background: @ws-active-bg;
+}
+
+/* =====================================================
+   WORKSPACES
+   ===================================================== */
+
+#workspaces {
+    background: @module-bg;
+    border: 1px solid @module-border;
+    border-radius: 14px;
+    padding: 2px 6px;
+    margin: 3px 2px;
+}
+
+#workspaces button {
+    color: @text-muted;
+    background: transparent;
+    border-radius: 10px;
+    padding: 1px 8px;
+    margin: 1px 2px;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
+}
+
+#workspaces button:hover {
+    color: @accent-purple;
+    background: @ws-hover-bg;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(.55,-0.68,.48,1.682);
+}
+
+#workspaces button.active {
+    color: @accent-blue;
+    background: @ws-active-bg;
+    border-radius: 10px;
+    padding: 1px 12px;
+    transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
+}
+
+#workspaces button.persistent {
+    color: @text-muted;
+}
+
+#workspaces button.urgent {
+    color: #f38ba8;
+    background: rgba(243, 139, 168, 0.15);
+}
+
+/* =====================================================
+   CLOCK
+   ===================================================== */
+
+#clock {
+    color: @accent-blue;
+    background: rgba(12, 12, 28, 0.92);
+    border: 1px solid rgba(137, 180, 250, 0.3);
+    border-radius: 12px;
+    padding: 4px 14px;
+    margin: 3px 2px;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+/* =====================================================
+   BATTERY
+   ===================================================== */
+
+#battery {
+    color: @accent-teal;
+    border-color: rgba(148, 226, 213, 0.25);
+}
+
+#battery.warning {
+    color: #fab387;
+    border-color: rgba(250, 179, 135, 0.25);
+}
+
+#battery.critical {
+    color: #f38ba8;
+    border-color: rgba(243, 139, 168, 0.35);
+    animation: battery_critical 1s ease-in-out infinite alternate;
+}
+
+#battery.charging {
+    color: #a6e3a1;
+    border-color: rgba(166, 227, 161, 0.25);
+}
+
+@keyframes battery_critical {
+    from { background: rgba(243, 139, 168, 0.05); }
+    to   { background: rgba(243, 139, 168, 0.2); }
+}
+
+/* =====================================================
+   NETWORK
+   ===================================================== */
+
+#network {
+    color: @accent-blue;
+    border-color: rgba(137, 180, 250, 0.22);
+}
+
+#network.disconnected {
+    color: @text-dim;
+}
+
+/* =====================================================
+   PULSEAUDIO / WIREPLUMBER
+   ===================================================== */
+
+#pulseaudio {
+    color: @accent-purple;
+    border-color: rgba(203, 166, 247, 0.22);
+}
+
+#pulseaudio.muted {
+    color: @text-muted;
+}
+
+#wireplumber {
+    color: @accent-purple;
+    border-color: rgba(203, 166, 247, 0.22);
+}
+
+/* =====================================================
+   TEMPERATURE
+   ===================================================== */
+
+#temperature {
+    color: @accent-teal;
+    border-color: rgba(148, 226, 213, 0.22);
+}
+
+#temperature.critical {
+    color: #f38ba8;
+    border-color: rgba(243, 139, 168, 0.35);
+}
+
+/* =====================================================
+   TRAY
+   ===================================================== */
+
+#tray {
+    border-color: @module-border;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background: rgba(243, 139, 168, 0.15);
+    border-radius: 8px;
+}
+
+/* =====================================================
+   IDLE INHIBITOR
+   ===================================================== */
+
+#idle_inhibitor {
+    color: @text-dim;
+    border-color: @module-border;
+}
+
+#idle_inhibitor.activated {
+    color: @accent-pink;
+    border-color: rgba(245, 194, 231, 0.35);
+}
+
+/* =====================================================
+   POWER PROFILES
+   ===================================================== */
+
+#power-profiles-daemon {
+    color: @accent-blue;
+}
+
+/* =====================================================
+   CUSTOM MODULES
+   ===================================================== */
+
+/* Playerctl / music info */
+#custom-playerctl {
+    color: @accent-pink;
+    background: @module-bg;
+    border: 1px solid rgba(245, 194, 231, 0.2);
+    border-radius: 12px;
+    padding: 3px 12px;
+    margin: 3px 2px;
+    font-style: italic;
+}
+
+#custom-playerctl.Playing {
+    color: @accent-pink;
+}
+
+#custom-playerctl.Paused {
+    color: @text-dim;
+}
+
+#custom-playerctl.Stopped {
+    color: @text-muted;
+}
+
+/* Cava visualizer */
+#custom-cava_mviz {
+    color: rgba(137, 180, 250, 0.7);
+    background: @module-bg;
+    border: 1px solid @module-border;
+    border-radius: 12px;
+    padding: 3px 10px;
+    margin: 3px 2px;
+    font-size: 11px;
+    letter-spacing: -1px;
+}
+
+/* Menu button */
+#custom-menu {
+    color: @accent-purple;
+    background: @module-bg;
+    border: 1px solid rgba(203, 166, 247, 0.28);
+    border-radius: 12px;
+    padding: 3px 10px;
+    margin: 3px 2px;
+    font-size: 15px;
+}
+
+#custom-menu:hover {
+    color: @accent-pink;
+    background: rgba(203, 166, 247, 0.1);
+}
+
+/* swaync notification bell */
+#custom-swaync {
+    color: @accent-blue;
+    background: @module-bg;
+    border: 1px solid rgba(137, 180, 250, 0.22);
+    border-radius: 12px;
+    padding: 3px 10px;
+    margin: 3px 2px;
+}
+
+/* Power button */
+#custom-power {
+    color: #f38ba8;
+    background: @module-bg;
+    border: 1px solid rgba(243, 139, 168, 0.25);
+    border-radius: 12px;
+    padding: 3px 10px;
+    margin: 3px 2px;
+    font-size: 14px;
+}
+
+#custom-power:hover {
+    background: rgba(243, 139, 168, 0.12);
+}
+
+/* Night light */
+#custom-nightlight {
+    color: #fab387;
+    background: @module-bg;
+    border: 1px solid rgba(250, 179, 135, 0.22);
+    border-radius: 12px;
+    padding: 3px 10px;
+    margin: 3px 2px;
+}
+
+/* Lock */
+#custom-lock {
+    color: @text-dim;
+    background: @module-bg;
+    border: 1px solid @module-border;
+    border-radius: 12px;
+    padding: 3px 10px;
+    margin: 3px 2px;
+}
+
+/* Weather */
+#custom-weather {
+    color: @accent-teal;
+    background: @module-bg;
+    border: 1px solid rgba(148, 226, 213, 0.22);
+    border-radius: 12px;
+    padding: 3px 10px;
+    margin: 3px 2px;
+}
+
+/* Separators */
+#custom-separator,
+#custom-separator-dot,
+#custom-separator-dot-line,
+#custom-separator-line,
+#custom-separator-blank,
+#custom-separator-blank_2,
+#custom-separator-blank_3 {
+    background: transparent;
+    border: none;
+    color: @text-muted;
+    padding: 0;
+    margin: 0;
+    font-size: 10px;
+}
+
+/* =====================================================
+   GROUPS
+   ===================================================== */
+
+/* All group containers inherit module style */
+#group-laptop,
+#group-audio,
+#group-mobo_drawer,
+#group-notify,
+#group-status,
+#group-app_drawer,
+#group-connections,
+#group-power {
+    background: @module-bg;
+    border: 1px solid @module-border;
+    border-radius: 12px;
+    padding: 2px 4px;
+    margin: 3px 2px;
+}
+
+/* =====================================================
+   BACKLIGHT
+   ===================================================== */
+
+#backlight {
+    color: #f9e2af;
+    border-color: rgba(249, 226, 175, 0.22);
+}
+
+/* =====================================================
+   DISK / CPU / MEMORY
+   ===================================================== */
+
+#disk {
+    color: @accent-teal;
+}
+
+#cpu {
+    color: @accent-blue;
+}
+
+#memory {
+    color: @accent-purple;
+}
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+
+@keyframes gradient_f {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
