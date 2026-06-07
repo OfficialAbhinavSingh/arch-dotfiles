@@ -1,5 +1,5 @@
 amd-ucode
-antigravity
+antigravity-ide
 awww
 base
 base-devel
@@ -14,7 +14,7 @@ catppuccin-gtk-theme-mocha
 cava
 claude-code
 cliphist
-cursor-bin
+cloud-utils
 dkms
 docker
 docker-compose
@@ -57,6 +57,7 @@ noto-fonts-emoji
 npm
 nvidia-open-dkms
 nwg-displays
+pacman-contrib
 papirus-icon-theme
 pavucontrol
 pipewire
@@ -69,6 +70,7 @@ python-pip
 qt5-wayland
 qt6-wayland
 rofi
+rofi-emoji
 rustup
 sddm
 slurp
@@ -93,7 +95,6 @@ wpa_supplicant
 xdg-desktop-portal-hyprland
 xdg-utils
 yay
-yay-debug
 zen-browser-bin
 zoxide
 zram-generator
