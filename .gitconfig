@@ -1,6 +1,7 @@
 [user]
 	name = OfficialAbhinavSingh
 	email = abhinav.25bcs10345@sst.scaler.com
+	signingkey = 4CEB1F0FD720A0DCDC1DE2F25862D99CBB29CC74
 [credential "https://github.com"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential
@@ -11,3 +12,9 @@
 	postBuffer = 524288000
 	lowSpeedLimit = 0
 	lowSpeedTime = 999999
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[gpg]
+	program = gpg

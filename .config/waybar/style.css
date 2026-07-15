@@ -17,7 +17,12 @@ window#waybar {
 #pulseaudio,
 #network,
 #battery,
-#tray {
+#tray,
+#custom-power,
+#custom-lock,
+#custom-suspend,
+#custom-reboot,
+#custom-shutdown {
   background: rgba(17, 17, 27, 0.82);
   color: #cdd6f4;
   border: 1px solid rgba(137, 180, 250, 0.45);
@@ -25,6 +30,42 @@ window#waybar {
   padding: 5px 12px;
   margin: 0 4px;
 }
+
+/* hover feedback for clickable info modules */
+#cpu:hover,
+#memory:hover,
+#pulseaudio:hover,
+#network:hover,
+#clock:hover {
+  background: rgba(137, 180, 250, 0.20);
+}
+
+/* ── Power drawer ──────────────────────────────────────────── */
+#custom-power {
+  color: #cba6f7;
+  border: 1px solid rgba(203, 166, 247, 0.55);
+  padding: 5px 13px;
+}
+
+#custom-power:hover {
+  background: rgba(203, 166, 247, 0.22);
+  color: #f5c2e7;
+}
+
+.power-item {
+  padding: 5px 11px;
+  margin: 0 3px;
+}
+
+#custom-lock     { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.45); }
+#custom-suspend  { color: #89b4fa; border-color: rgba(137, 180, 250, 0.45); }
+#custom-reboot   { color: #f9e2af; border-color: rgba(249, 226, 175, 0.45); }
+#custom-shutdown { color: #f38ba8; border-color: rgba(243, 139, 168, 0.45); }
+
+#custom-lock:hover     { background: rgba(166, 227, 161, 0.22); }
+#custom-suspend:hover  { background: rgba(137, 180, 250, 0.22); }
+#custom-reboot:hover   { background: rgba(249, 226, 175, 0.22); }
+#custom-shutdown:hover { background: rgba(243, 139, 168, 0.22); }
 
 #workspaces button {
   background: transparent;

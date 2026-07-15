@@ -1,0 +1,50 @@
+#!/bin/bash
+# Live (mp4) wallpaper toggle for Hyprland via mpvpaper.
+# Picks a random video from ~/Videos/wallpapers and plays it as the wallpaper.
+# Re-run to shuffle to a new clip. Use `live-wallpaper stop` to return to static.
+
+WALLDIR="$HOME/Videos/wallpapers"
+MON="*"
+
+# Best quality settings for AMD Radeon 680M (VAAPI) + Wayland
+#   hwdec=vaapi          -> AMD hardware decode (zero CPU, native)
+#   scale=lanczos        -> best upscaling quality
+#   cscale=lanczos       -> chroma upscale quality
+#   video-sync=display-resample -> sync to monitor Hz (no stutter)
+#   interpolation        -> smooth frame blending between video frames
+#   tscale=oversample    -> temporal interpolation (silky motion)
+#   panscan=1.0          -> fill screen, crop instead of letterbox
+MPV_OPTS="no-audio loop hwdec=vaapi panscan=1.0 scale=lanczos cscale=lanczos video-sync=display-resample interpolation tscale=oversample"
+
+stop() {
+    pkill -x mpvpaper 2>/dev/null
+}
+
+restore_static() {
+    local wall
+    wall=$(find ~/Pictures/wallpapers/ -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
+    [ -n "$wall" ] && awww img "$wall" 2>/dev/null
+}
+
+case "$1" in
+    stop)
+        stop
+        restore_static
+        notify-send "Live Wallpaper" "Stopped — static wallpaper restored." 2>/dev/null
+        exit 0
+        ;;
+esac
+
+vid=$(find "$WALLDIR" -type f \( -iname '*.mp4' -o -iname '*.mkv' -o -iname '*.webm' -o -iname '*.mov' \) | shuf -n 1)
+
+if [ -z "$vid" ]; then
+    notify-send "Live Wallpaper" "No videos in $WALLDIR" 2>/dev/null
+    echo "No videos found in $WALLDIR"
+    exit 1
+fi
+
+stop
+# -f fork to background, -p auto-pause when a fullscreen window covers it (saves battery)
+mpvpaper -f -p -o "$MPV_OPTS" "$MON" "$vid"
+
+notify-send "Live Wallpaper" "Now playing $(basename "$vid")" 2>/dev/null

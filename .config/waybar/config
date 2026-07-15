@@ -9,42 +9,114 @@
 
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["cpu", "memory", "pulseaudio", "network", "battery", "tray"],
+  "modules-right": ["cpu", "memory", "pulseaudio", "network", "battery", "tray", "group/power"],
 
   "hyprland/workspaces": {
     "format": "{name}",
+    "all-outputs": false,
+    "sort-by-number": true,
     "persistent-workspaces": {
-      "*": 5
+      "eDP-1": [1, 2, 3, 4, 5],
+      "HDMI-A-1": [6, 7, 8, 9, 10]
     }
   },
 
   "clock": {
-    "format": "  {:%I:%M %p}"
+    "format": "  {:%I:%M %p}",
+    "format-alt": "  {:%a %d %b %Y}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "format": {
+        "today": "<span color='#f5c2e7'><b>{}</b></span>"
+      }
+    }
   },
 
   "cpu": {
-    "format": "  {usage}%"
+    "format": "  {usage}%",
+    "interval": 2,
+    "tooltip-format": "CPU {usage}%  ·  click for btop",
+    "on-click": "kitty -e btop"
   },
 
   "memory": {
-    "format": "  {}%"
+    "format": "  {}%",
+    "interval": 5,
+    "tooltip-format": "RAM {used:0.1f}G / {total:0.1f}G",
+    "on-click": "kitty -e btop"
   },
 
   "pulseaudio": {
-    "format": "  {volume}%"
+    "format": "  {volume}%",
+    "format-muted": "  muted",
+    "tooltip-format": "{desc}  ·  {volume}%",
+    "on-click": "pavucontrol",
+    "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
+    "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%"
   },
 
   "network": {
-    "format-wifi": "  {essid}",
-    "format-disconnected": "󰖪  offline"
+    "format-wifi": "  {essid}",
+    "format-ethernet": "󰈀  wired",
+    "format-disconnected": "󰖪  offline",
+    "tooltip-format-wifi": "{essid}  ·  {signalStrength}%  ·  {ipaddr}",
+    "tooltip-format-disconnected": "disconnected",
+    "on-click": "kitty -e nmtui"
   },
 
   "battery": {
-    "format": "  {capacity}%",
-    "format-charging": " {capacity}%"
+    "format": "  {capacity}%",
+    "format-charging": " {capacity}%",
+    "format-full": "  {capacity}%",
+    "states": {
+      "warning": 30,
+      "critical": 15
+    },
+    "tooltip-format": "{capacity}%  ·  {timeTo}"
   },
 
   "tray": {
     "spacing": 10
+  },
+
+  "group/power": {
+    "orientation": "inherit",
+    "drawer": {
+      "transition-duration": 350,
+      "children-class": "power-item",
+      "transition-left-to-right": false
+    },
+    "modules": ["custom/power", "custom/lock", "custom/suspend", "custom/reboot", "custom/shutdown"]
+  },
+
+  "custom/power": {
+    "format": "⏻",
+    "tooltip-format": "Power menu"
+  },
+
+  "custom/lock": {
+    "format": "󰌾",
+    "tooltip-format": "Lock",
+    "on-click": "hyprlock"
+  },
+
+  "custom/suspend": {
+    "format": "",
+    "tooltip-format": "Sleep",
+    "on-click": "systemctl suspend"
+  },
+
+  "custom/reboot": {
+    "format": "󰜉",
+    "tooltip-format": "Reboot",
+    "on-click": "systemctl reboot"
+  },
+
+  "custom/shutdown": {
+    "format": "󰐥",
+    "tooltip-format": "Shutdown",
+    "on-click": "systemctl poweroff"
   }
 }

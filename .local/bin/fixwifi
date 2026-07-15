@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "Reloading MT7921E..."
+
+sudo modprobe -r mt7921e mt7921_common mt76_connac_lib mt76
+sleep 2
+sudo modprobe mt7921e
+
+sudo systemctl restart NetworkManager
+
+echo
+echo "Devices:"
+nmcli device
