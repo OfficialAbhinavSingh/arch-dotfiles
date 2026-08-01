@@ -128,3 +128,7 @@ export PATH="/home/laterabhi/.local/bin:$PATH"
 # <<< Codex installer <<<
 
 source /home/laterabhi/.daytona.completion_script.zsh
+
+# kimi-code
+export PATH="/home/laterabhi/.kimi-code/bin:$PATH"
+alias cgc="~/.venvs/cgc/bin/cgc"
