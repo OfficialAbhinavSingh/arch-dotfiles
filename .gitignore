@@ -13,6 +13,9 @@
 .claude/plugins/
 .claude/ide/
 .claude/hooks/
+# .zshrc sources ~/.config/secret for API keys — the file itself stays local.
+.config/secret
+.zshrc.bak-*
 **/.env
 **/.env.*
 *.pem
