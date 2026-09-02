@@ -1,0 +1,34 @@
+# ── Never commit credentials ──────────────────────────────────────────────────
+# Claude Code keeps its OAuth token here, and ~/.claude.json holds MCP server
+# secrets (Firecrawl API key, Discord bot token). Only the declarative config
+# files under .claude/ are tracked: settings.json, CLAUDE.md, RTK.md.
+.claude/.credentials.json
+.claude.json
+.claude/projects/
+.claude/todos/
+.claude/shell-snapshots/
+.claude/history.jsonl
+.claude/statsig/
+.claude/file-history/
+.claude/plugins/
+.claude/ide/
+.claude/hooks/
+**/.env
+**/.env.*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# ── Runtime state, caches, sockets ────────────────────────────────────────────
+.config/herdr/*.log
+.config/herdr/*.sock
+.config/herdr/session.json
+.config/herdr/release-notes.json
+.config/herdr/.plugins.lock
+.config/zen/*/
+.config/google-chrome/
+*.log
+*.bak
+*.bak_*
+*.pkg.tar.zst

@@ -1,0 +1,18 @@
+[Unit]
+Description=Nudge the amdgpu panel backlight so the PWM is actually programmed
+Documentation=https://gitlab.freedesktop.org/drm/amd/-/issues
+# systemd-backlight restores the same value the register already holds at
+# power-on (max), so amdgpu treats the write as a no-op and never starts the
+# panel PWM: brightness reads max while actual_brightness stays 0 and the screen
+# looks dead. Writing a different value first forces the reprogram.
+After=systemd-backlight@backlight:amdgpu_bl1.service
+Before=display-manager.service
+ConditionPathExists=/sys/class/backlight/amdgpu_bl1/brightness
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'b=/sys/class/backlight/amdgpu_bl1; m=$(cat "$b/max_brightness"); cur=$(cat "$b/brightness"); [ "$cur" -ge "$m" ] && cur=$((m - 1)); printf %s "$((m / 2))" > "$b/brightness"; printf %s "$cur" > "$b/brightness"'
+
+[Install]
+WantedBy=graphical.target

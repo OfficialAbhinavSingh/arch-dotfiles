@@ -1,0 +1,10 @@
+[Unit]
+Description=Hourly trim of oversized Hyprland debug logs
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=1h
+Persistent=false
+
+[Install]
+WantedBy=timers.target

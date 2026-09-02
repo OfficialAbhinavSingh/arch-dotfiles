@@ -1,0 +1,24 @@
+#!/bin/bash
+# Rofi power menu. Bound to SUPER+M.
+# Replaces the old bind, which called the non-existent `hyprshutdown` and fell
+# back to `hyprctl dispatch 'hl.dsp.exit()'` — a session kill with no prompt.
+# Icons are written as escapes so they survive editors/pipes that strip
+# private-use codepoints.
+
+lock=$(printf '\Uf033e')
+sleep_=$(printf '\Uf0904')
+out=$(printf '\Uf0343')
+rst=$(printf '\Uf0709')
+off=$(printf '\Uf0425')
+
+choice=$(printf '%s  Lock\n%s  Sleep\n%s  Log out\n%s  Reboot\n%s  Shut down' \
+    "$lock" "$sleep_" "$out" "$rst" "$off" \
+    | rofi -dmenu -i -p "Power" -theme-str 'window {width: 260px;}')
+
+case "$choice" in
+    *Lock*)        hyprlock ;;
+    *Sleep*)       systemctl suspend ;;
+    *"Log out"*)   uwsm stop ;;
+    *Reboot*)      systemctl reboot ;;
+    *"Shut down"*) systemctl poweroff ;;
+esac

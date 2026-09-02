@@ -1,0 +1,82 @@
+onboarding = false
+
+[keys]
+# One-key prefix. Double-tap sends a literal backtick.
+prefix = "backtick"
+
+# --- global ---
+help = "prefix+?"
+settings = "prefix+s"                    # Settings
+detach = "prefix+d"                      # Detach
+goto = "prefix+g"                        # Goto
+copy_mode = "prefix+c"                   # Copy mode
+edit_scrollback = "prefix+e"             # Edit scrollback
+open_notification_target = "prefix+o"    # Open notification
+toggle_sidebar = "prefix+b"              # sideBar
+reload_config = "prefix+shift+r"
+
+# --- tabs (lowercase = tab scope) ---
+new_tab = "prefix+n"                     # New tab
+rename_tab = "prefix+shift+t"            # rename Tab
+close_tab = "prefix+shift+x"
+next_tab = "prefix+right"
+previous_tab = "prefix+left"
+switch_tab = "prefix+1..9"
+
+# --- workspaces (shift = workspace scope) ---
+workspace_picker = "prefix+w"            # Workspace picker
+new_workspace = "prefix+shift+n"         # New workspace
+rename_workspace = "prefix+shift+w"      # rename Workspace
+close_workspace = "prefix+shift+d"
+next_workspace = "prefix+down"
+previous_workspace = "prefix+up"
+switch_workspace = "prefix+shift+1..9"
+
+# --- worktrees ---
+new_worktree = "prefix+shift+g"          # new Git worktree
+open_worktree = "prefix+shift+o"         # Open worktree
+remove_worktree = "prefix+shift+backspace"   # destructive: deliberate awkward key
+
+# --- agents ---
+next_agent = "prefix+a"                  # Agent next
+previous_agent = "prefix+shift+a"
+focus_agent = "prefix+alt+1..9"
+
+# --- panes ---
+split_vertical = "prefix+v"              # Vertical split
+split_horizontal = "prefix+minus"        # "-" looks horizontal
+close_pane = "prefix+x"
+zoom = "prefix+z"                        # Zoom
+resize_mode = "prefix+r"                 # Resize
+rename_pane = "prefix+shift+p"           # rename Pane
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+swap_pane_left = "prefix+shift+h"
+swap_pane_down = "prefix+shift+j"
+swap_pane_up = "prefix+shift+k"
+swap_pane_right = "prefix+shift+l"
+cycle_pane_next = "prefix+tab"
+cycle_pane_previous = "prefix+shift+tab"
+last_pane = "prefix+space"
+
+# --- navigate mode (no prefix; local to the overlay) ---
+navigate_workspace_up = "up"
+navigate_workspace_down = "down"
+navigate_pane_left = "h"
+navigate_pane_down = "j"
+navigate_pane_up = "k"
+navigate_pane_right = "l"
+
+[theme]
+name = "gruvbox"
+auto_switch = false
+
+# --- custom commands ---
+[[keys.command]]
+key = "prefix+f"          # lazygit
+type = "popup"
+command = "lazygit"
+width = "90%"
+height = "90%"

@@ -1,0 +1,20 @@
+#!/bin/bash
+# Shuffles through the active wallpaper pack on an interval via awww.
+# Default pack: jjk-gojo-pack. Override with WALLDIR env var.
+
+WALLDIR="${WALLDIR:-$HOME/Pictures/wallpapers/jjk-gojo-pack}"
+INTERVAL="${INTERVAL:-600}"
+
+set_random() {
+    local wall
+    wall=$(find "$WALLDIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
+    if [ -z "$wall" ]; then
+        echo "No wallpaper found in $WALLDIR" >&2
+        return 1
+    fi
+    awww img "$wall"
+    wallust run -s -d ~/.config/wallust/ "$wall" 2>/dev/null  # -s: never push palette sequences into live terminals (kitty.conf owns terminal colors)
+    killall -SIGUSR2 waybar 2>/dev/null
+}
+
+set_random

@@ -1,21 +1,44 @@
+/* Waybar — flat, opaque, borderless. One accent colour (mauve), everything
+ * else neutral. Related modules live inside grouped pills so the bar reads as
+ * five blocks instead of a dozen chiclets.
+ *
+ * No gradients, no shadows, no transitions except the power drawer: GTK
+ * repaints a widget whenever a property animates, and an idle bar should
+ * repaint nothing. */
+
+@define-color bg      #181825;
+@define-color fg      #cdd6f4;
+@define-color muted   #7f849c;
+@define-color accent  #cba6f7;
+@define-color warn    #f9e2af;
+@define-color crit    #f38ba8;
+@define-color good    #a6e3a1;
+
 * {
   font-family: "JetBrainsMono Nerd Font";
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   border: none;
+  border-radius: 0;
   min-height: 0;
+  transition: none;
+  box-shadow: none;
+  text-shadow: none;
 }
 
 window#waybar {
   background: transparent;
+  color: @fg;
 }
 
+/* ── the five blocks ──────────────────────────────────────── */
 #workspaces,
+#window,
 #clock,
-#cpu,
-#memory,
-#pulseaudio,
-#network,
+#ctrl,
+#out,
+#stats,
+#conn,
 #battery,
 #tray,
 #custom-power,
@@ -23,71 +46,158 @@ window#waybar {
 #custom-suspend,
 #custom-reboot,
 #custom-shutdown {
-  background: rgba(17, 17, 27, 0.82);
-  color: #cdd6f4;
-  border: 1px solid rgba(137, 180, 250, 0.45);
-  border-radius: 14px;
-  padding: 5px 12px;
-  margin: 0 4px;
+  background: @bg;
+  color: @fg;
+  border-radius: 12px;
+  padding: 3px 6px;
+  margin: 0;
 }
 
-/* hover feedback for clickable info modules */
-#cpu:hover,
-#memory:hover,
-#pulseaudio:hover,
-#network:hover,
-#clock:hover {
-  background: rgba(137, 180, 250, 0.20);
+/* modules nested inside a group carry no pill of their own */
+#ctrl > widget > *,
+#out > widget > *,
+#stats > widget > *,
+#conn > widget > * {
+  background: transparent;
+  border-radius: 0;
+  padding: 2px 10px;
+  margin: 0;
 }
 
-/* ── Power drawer ──────────────────────────────────────────── */
-#custom-power {
-  color: #cba6f7;
-  border: 1px solid rgba(203, 166, 247, 0.55);
-  padding: 5px 13px;
+#ctrl  { padding: 3px 2px; }
+#out   { padding: 3px 2px; }
+#stats { padding: 3px 2px; }
+#conn  { padding: 3px 2px; }
+
+/* ── workspaces ───────────────────────────────────────────── */
+#workspaces {
+  padding: 3px 4px;
 }
-
-#custom-power:hover {
-  background: rgba(203, 166, 247, 0.22);
-  color: #f5c2e7;
-}
-
-.power-item {
-  padding: 5px 11px;
-  margin: 0 3px;
-}
-
-#custom-lock     { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.45); }
-#custom-suspend  { color: #89b4fa; border-color: rgba(137, 180, 250, 0.45); }
-#custom-reboot   { color: #f9e2af; border-color: rgba(249, 226, 175, 0.45); }
-#custom-shutdown { color: #f38ba8; border-color: rgba(243, 139, 168, 0.45); }
-
-#custom-lock:hover     { background: rgba(166, 227, 161, 0.22); }
-#custom-suspend:hover  { background: rgba(137, 180, 250, 0.22); }
-#custom-reboot:hover   { background: rgba(249, 226, 175, 0.22); }
-#custom-shutdown:hover { background: rgba(243, 139, 168, 0.22); }
 
 #workspaces button {
   background: transparent;
-  color: #89b4fa;
+  color: @muted;
   padding: 0 9px;
-  margin: 0 2px;
+  margin: 0 1px;
+  border-radius: 9px;
+  font-weight: 700;
+}
+
+#workspaces button.visible { color: @fg; }
+
+#workspaces button.active {
+  background: @accent;
+  color: @bg;
+}
+
+#workspaces button.urgent {
+  background: @crit;
+  color: @bg;
+}
+
+#workspaces button:hover {
+  background: #313244;
+  color: @fg;
+}
+
+/* ── window title ─────────────────────────────────────────── */
+#window {
+  color: @muted;
+  font-weight: 500;
+  padding: 3px 12px;
+}
+
+window#waybar.empty #window {
+  background: transparent;
+  color: transparent;
+}
+
+/* ── clock: the one accented element ──────────────────────── */
+#clock {
+  color: @accent;
+  font-weight: 700;
+  padding: 3px 14px;
+}
+
+/* ── hover feedback, flat ─────────────────────────────────── */
+#clock:hover,
+#battery:hover,
+#ctrl > widget > *:hover,
+#out > widget > *:hover,
+#stats > widget > *:hover,
+#conn > widget > *:hover {
+  background: #313244;
+  border-radius: 9px;
+}
+
+/* ── states: colour only when something needs attention ───── */
+#battery         { padding: 3px 12px; }
+#battery.charging { color: @good; }
+#battery.warning  { color: @warn; }
+#battery.critical { color: @crit; }
+
+#cpu.warning, #memory.warning   { color: @warn; }
+#cpu.critical, #memory.critical { color: @crit; }
+#temperature.critical           { color: @crit; }
+
+#pulseaudio.muted     { color: @muted; }
+#bluetooth.disabled,
+#bluetooth.off        { color: @muted; }
+#network.disconnected { color: @crit; }
+
+#idle_inhibitor.activated { color: @warn; }
+
+#power-profiles-daemon.performance { color: @crit; }
+#power-profiles-daemon.balanced    { color: @fg; }
+#power-profiles-daemon.power-saver { color: @good; }
+
+#language { color: @muted; }
+
+/* ── tray ─────────────────────────────────────────────────── */
+#tray {
+  padding: 3px 10px;
+}
+
+#tray menu {
+  background: @bg;
+  color: @fg;
+}
+
+/* ── power drawer ─────────────────────────────────────────── */
+#custom-power {
+  color: @accent;
+  padding: 3px 12px;
+}
+
+#custom-power:hover {
+  background: @accent;
+  color: @bg;
+}
+
+.power-item {
+  padding: 3px 10px;
+  margin: 0 1px;
+  transition: background 150ms ease;
+}
+
+#custom-lock     { color: @good; }
+#custom-suspend  { color: #89b4fa; }
+#custom-reboot   { color: @warn; }
+#custom-shutdown { color: @crit; }
+
+#custom-lock:hover     { background: @good; color: @bg; }
+#custom-suspend:hover  { background: #89b4fa; color: @bg; }
+#custom-reboot:hover   { background: @warn; color: @bg; }
+#custom-shutdown:hover { background: @crit; color: @bg; }
+
+/* ── tooltips ─────────────────────────────────────────────── */
+tooltip {
+  background: @bg;
+  border: 1px solid #313244;
   border-radius: 10px;
 }
 
-#workspaces button.active {
-  background: rgba(137, 180, 250, 0.28);
-  color: #f5c2e7;
-}
-
-#battery.charging {
-  color: #a6e3a1;
-}
-
-#battery.warning {
-  color: #f9e2af;
-}
-
-#battery.critical {
-  color: #f38ba8;
+tooltip label {
+  color: @fg;
+  font-weight: 500;
 }
