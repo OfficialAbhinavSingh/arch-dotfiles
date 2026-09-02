@@ -1,0 +1,143 @@
+# starship — prompt config
+# Catppuccin Mocha with the same mauve accent as Hyprland/waybar/kitty.
+# Two lines: context on the first, a bare ❯ on the second, so long paths and
+# git state never squeeze the line you actually type on.
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+[](surface1)\
+$os\
+$directory\
+$git_branch\
+$git_status\
+$fill\
+$nodejs$python$rust$golang$java\
+$cmd_duration\
+$time\
+$line_break\
+$character"""
+
+palette = 'catppuccin_mocha'
+add_newline = true
+# Never let a slow module stall the prompt.
+command_timeout = 500
+scan_timeout = 10
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+mauve = "#cba6f7"
+red = "#f38ba8"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext0 = "#a6adc8"
+overlay0 = "#6c7086"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+crust = "#11111b"
+
+[fill]
+symbol = " "
+
+[os]
+disabled = false
+style = "bg:surface1 fg:mauve"
+format = '[ $symbol ]($style)'
+
+[os.symbols]
+Arch = "󰣇"
+
+[directory]
+style = "bg:surface0 fg:mauve"
+format = "[ $path ]($style)[$read_only]($read_only_style)"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+read_only = " 󰌾"
+read_only_style = "bg:surface0 fg:red"
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = ""
+"Pictures" = ""
+"Projects" = "󰲋"
+
+[git_branch]
+symbol = ""
+style = "bg:surface0 fg:green"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:surface0 fg:peach"
+format = '[$all_status$ahead_behind ]($style)'
+conflicted = "󰅖 "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕⇡${ahead_count}⇣${behind_count} "
+untracked = "?${count} "
+stashed = " "
+modified = "!${count} "
+staged = "+${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
+
+[cmd_duration]
+min_time = 2000
+style = "fg:yellow"
+format = '[  $duration ]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "fg:overlay0"
+format = '[  $time ]($style)'
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold mauve)"
+
+# ── language versions: only shown inside a relevant project ──────────────────
+[nodejs]
+symbol = ""
+style = "fg:green"
+format = '[ $symbol $version ]($style)'
+detect_files = ["package.json", ".node-version"]
+
+[python]
+symbol = ""
+style = "fg:yellow"
+format = '[ $symbol $version( \($virtualenv\)) ]($style)'
+
+[rust]
+symbol = ""
+style = "fg:peach"
+format = '[ $symbol $version ]($style)'
+
+[golang]
+symbol = ""
+style = "fg:teal"
+format = '[ $symbol $version ]($style)'
+
+[java]
+symbol = ""
+style = "fg:red"
+format = '[ $symbol $version ]($style)'
+
+# ── off: each one costs a subprocess on every prompt ────────────────────────
+[aws]
+disabled = true
+[gcloud]
+disabled = true
+[kubernetes]
+disabled = true
+[package]
+disabled = true
+[docker_context]
+disabled = true
