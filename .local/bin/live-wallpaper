@@ -22,7 +22,7 @@ stop() {
 
 restore_static() {
     local wall
-    wall=$(find ~/Pictures/wallpapers/ -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
+    wall=$(find ~/Pictures/wallpapers/jjk-gojo-pack -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
     [ -n "$wall" ] && awww img "$wall" 2>/dev/null
 }
 

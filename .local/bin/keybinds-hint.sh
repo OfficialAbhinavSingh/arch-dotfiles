@@ -1,12 +1,6 @@
 #!/bin/bash
 # ⌨️ Hyprland Keybind Cheatsheet
+# Parses hyprland.lua via hypr-cheatsheet.py (config went hyprlang -> lua, 2026-08-14)
 
-config_file="$HOME/.config/hypr/hyprland.conf"
-
-# Extract binds and comments
-cheatsheet=$(grep -E '^bind|^# ──' "$config_file" | \
-    sed 's/^bind = //g' | \
-    sed 's/^# ── //g' | \
-    sed 's/ ──.*//g')
-
-echo "$cheatsheet" | rofi -dmenu -i -p "Keybinds" -config ~/.config/rofi/config.rasi
+python3 "$HOME/.local/bin/hypr-cheatsheet.py" | \
+    rofi -dmenu -i -p "Keybinds" -config ~/.config/rofi/config.rasi

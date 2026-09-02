@@ -2,28 +2,67 @@
   "layer": "top",
   "position": "top",
   "height": 34,
-  "margin-top": 8,
-  "margin-left": 14,
-  "margin-right": 14,
-  "spacing": 8,
-
-  "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["clock"],
-  "modules-right": ["cpu", "memory", "pulseaudio", "network", "battery", "tray", "group/power"],
-
+  "margin-top": 6,
+  "margin-left": 10,
+  "margin-right": 10,
+  "spacing": 10,
+  "modules-left": [
+    "hyprland/workspaces",
+    "hyprland/window",
+    "group/stats"
+  ],
+  "modules-center": [
+    "clock"
+  ],
+  "modules-right": [
+    "group/ctrl",
+    "group/out",
+    "group/conn",
+    "battery",
+    "tray",
+    "group/power"
+  ],
   "hyprland/workspaces": {
     "format": "{name}",
     "all-outputs": false,
     "sort-by-number": true,
+    "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+    "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'",
     "persistent-workspaces": {
-      "eDP-1": [1, 2, 3, 4, 5],
-      "HDMI-A-1": [6, 7, 8, 9, 10]
+      "eDP-1": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "eDP-2": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "HDMI-A-1": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
     }
   },
-
+  "hyprland/window": {
+    "format": "{title}",
+    "max-length": 28,
+    "separate-outputs": true,
+    "rewrite": {
+      "^$": "󰖰  desktop"
+    }
+  },
   "clock": {
-    "format": "  {:%I:%M %p}",
-    "format-alt": "  {:%a %d %b %Y}",
+    "format": "󰥔  {:%I:%M %p}",
+    "format-alt": "󰃭  {:%a %d %b %Y}",
     "tooltip-format": "<tt><small>{calendar}</small></tt>",
     "calendar": {
       "mode": "month",
@@ -32,91 +71,199 @@
       }
     }
   },
-
-  "cpu": {
-    "format": "  {usage}%",
-    "interval": 2,
-    "tooltip-format": "CPU {usage}%  ·  click for btop",
-    "on-click": "kitty -e btop"
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "󰅶",
+      "deactivated": "󰅷"
+    },
+    "tooltip-format-activated": "Screen kept awake — click to allow sleep",
+    "tooltip-format-deactivated": "Idle sleep allowed on battery — click to keep awake"
   },
-
-  "memory": {
-    "format": "  {}%",
+  "power-profiles-daemon": {
+    "format": "{icon}",
+    "tooltip-format": "Power profile: {profile}\nclick to cycle",
+    "format-icons": {
+      "default": "󰓅",
+      "performance": "󰾆",
+      "balanced": "󰓅",
+      "power-saver": "󰌪"
+    }
+  },
+  "hyprland/language": {
+    "format": "󰌌  {short}",
+    "tooltip-format": "Keyboard layout: {long}\nALT+Shift switches"
+  },
+  "backlight": {
+    "format": "{icon}  {percent}%",
+    "format-icons": [
+      "󰃞",
+      "󰃟",
+      "󰃠"
+    ],
+    "tooltip-format": "Backlight {percent}%  ·  scroll to change",
+    "on-scroll-up": "brightnessctl set +5%",
+    "on-scroll-down": "brightnessctl set 5%-"
+  },
+  "temperature": {
+    "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
+    "input-filename": "temp1_input",
     "interval": 5,
-    "tooltip-format": "RAM {used:0.1f}G / {total:0.1f}G",
+    "critical-threshold": 90,
+    "format": "󰔏  {temperatureC}°",
+    "format-critical": "󰔏  {temperatureC}°",
+    "tooltip-format": "CPU package {temperatureC}°C  ·  click for btop",
     "on-click": "kitty -e btop"
   },
-
+  "cpu": {
+    "format": "󰻠  {usage}%",
+    "interval": 5,
+    "states": {
+      "warning": 70,
+      "critical": 90
+    },
+    "tooltip-format": "CPU {usage}%  ·  load {load}  ·  click for btop",
+    "on-click": "kitty -e btop"
+  },
+  "memory": {
+    "format": "󰍛  {}%",
+    "interval": 10,
+    "states": {
+      "warning": 80,
+      "critical": 92
+    },
+    "tooltip-format": "RAM {used:0.1f}G / {total:0.1f}G  ·  swap {swapUsed:0.1f}G (zram)",
+    "on-click": "kitty -e btop"
+  },
   "pulseaudio": {
-    "format": "  {volume}%",
-    "format-muted": "  muted",
+    "format": "{icon}  {volume}%",
+    "format-muted": "󰝟  muted",
+    "format-icons": {
+      "headphone": "󰋋",
+      "headset": "󰋋",
+      "default": [
+        "󰖁",
+        "󰖀",
+        "󰕾"
+      ]
+    },
     "tooltip-format": "{desc}  ·  {volume}%",
     "on-click": "pavucontrol",
     "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
     "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
     "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%"
   },
-
+  "bluetooth": {
+    "format": "󰂯",
+    "format-disabled": "󰂲",
+    "format-off": "󰂲",
+    "format-connected": "󰂱  {num_connections}",
+    "tooltip-format": "{controller_alias}\n{status}",
+    "tooltip-format-connected": "{controller_alias}\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}  {device_battery_percentage}%",
+    "on-click": "blueman-manager",
+    "on-click-right": "bluetoothctl power off"
+  },
   "network": {
-    "format-wifi": "  {essid}",
+    "format-wifi": "󰖩  {essid}",
     "format-ethernet": "󰈀  wired",
     "format-disconnected": "󰖪  offline",
-    "tooltip-format-wifi": "{essid}  ·  {signalStrength}%  ·  {ipaddr}",
+    "tooltip-format-wifi": "{essid}  ·  {signalStrength}%  ·  {ipaddr}\n↓ {bandwidthDownBytes}  ↑ {bandwidthUpBytes}",
+    "tooltip-format-ethernet": "{ifname}  ·  {ipaddr}",
     "tooltip-format-disconnected": "disconnected",
-    "on-click": "kitty -e nmtui"
+    "on-click": "kitty -e nmtui",
+    "on-click-right": "nm-connection-editor"
   },
-
   "battery": {
-    "format": "  {capacity}%",
-    "format-charging": " {capacity}%",
-    "format-full": "  {capacity}%",
+    "format": "{icon}  {capacity}%",
+    "format-charging": "󰂄  {capacity}%",
+    "format-full": "󰁹  {capacity}%",
+    "format-icons": [
+      "󰁺",
+      "󰁼",
+      "󰁾",
+      "󰂀",
+      "󰂂",
+      "󰁹"
+    ],
     "states": {
       "warning": 30,
       "critical": 15
     },
-    "tooltip-format": "{capacity}%  ·  {timeTo}"
+    "tooltip-format": "{capacity}%  ·  {timeTo}  ·  {power}W"
   },
-
   "tray": {
-    "spacing": 10
+    "spacing": 10,
+    "icon-size": 16
   },
-
   "group/power": {
     "orientation": "inherit",
     "drawer": {
-      "transition-duration": 350,
+      "transition-duration": 200,
       "children-class": "power-item",
       "transition-left-to-right": false
     },
-    "modules": ["custom/power", "custom/lock", "custom/suspend", "custom/reboot", "custom/shutdown"]
+    "modules": [
+      "custom/power",
+      "custom/lock",
+      "custom/suspend",
+      "custom/reboot",
+      "custom/shutdown"
+    ]
   },
-
   "custom/power": {
-    "format": "⏻",
-    "tooltip-format": "Power menu"
+    "format": "󰐥",
+    "tooltip-format": "Power menu (or SUPER+M)",
+    "on-click": "$HOME/.local/bin/power-menu"
   },
-
   "custom/lock": {
     "format": "󰌾",
     "tooltip-format": "Lock",
     "on-click": "hyprlock"
   },
-
   "custom/suspend": {
-    "format": "",
+    "format": "󰤄",
     "tooltip-format": "Sleep",
     "on-click": "systemctl suspend"
   },
-
   "custom/reboot": {
     "format": "󰜉",
     "tooltip-format": "Reboot",
     "on-click": "systemctl reboot"
   },
-
   "custom/shutdown": {
-    "format": "󰐥",
+    "format": "󰍃",
     "tooltip-format": "Shutdown",
     "on-click": "systemctl poweroff"
+  },
+  "group/ctrl": {
+    "orientation": "horizontal",
+    "modules": [
+      "idle_inhibitor",
+      "power-profiles-daemon",
+      "hyprland/language"
+    ]
+  },
+  "group/out": {
+    "orientation": "horizontal",
+    "modules": [
+      "backlight",
+      "pulseaudio"
+    ]
+  },
+  "group/stats": {
+    "orientation": "horizontal",
+    "modules": [
+      "temperature",
+      "cpu",
+      "memory"
+    ]
+  },
+  "group/conn": {
+    "orientation": "horizontal",
+    "modules": [
+      "bluetooth",
+      "network"
+    ]
   }
 }

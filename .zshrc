@@ -116,7 +116,16 @@ export BROWSER=zen
 export PATH="$HOME/.local/bin:/opt/claude-code/bin:$PATH"
 alias dot='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-
+alias n='nvim'
+alias ff='fastfetch'
+clear-and-ff() { # clear && ff on alt + L
+    clear
+    ff
+    zle redisplay
+}
+zle -N clear-and-ff
+bindkey '\el' clear-and-ff
+ 
 
 . "$HOME/.local/share/../bin/env"
 export PATH="$HOME/.npm-global/bin:$PATH"
@@ -132,3 +141,16 @@ source /home/laterabhi/.daytona.completion_script.zsh
 # kimi-code
 export PATH="/home/laterabhi/.kimi-code/bin:$PATH"
 alias cgc="~/.venvs/cgc/bin/cgc"
+
+source ~/.config/secret
+
+# bun completions
+[ -s "/home/laterabhi/.bun/_bun" ] && source "/home/laterabhi/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+ 
+
+# Autosuggestion ghost text: default fg=8 is near-invisible on a dark bg.
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#6c7086'

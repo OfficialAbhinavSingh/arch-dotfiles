@@ -1,0 +1,10 @@
+[Unit]
+Description=Truncate oversized Hyprland debug logs in /run (tmpfs = RAM)
+Documentation=man:hyprland(1)
+
+[Service]
+Type=oneshot
+# Hyprland 0.56 keeps writing aquamarine libinput gesture DEBUG lines even with
+# debug:disable_logs = true, ~15MB/day straight into tmpfs. Truncating is safe:
+# the compositor holds the fd O_APPEND, so it just keeps writing from zero.
+ExecStart=/usr/bin/find %t/hypr -name hyprland.log -size +5M -exec /usr/bin/truncate -s 0 {} +
