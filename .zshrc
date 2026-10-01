@@ -171,3 +171,12 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Autosuggestion ghost text: default fg=8 is near-invisible on a dark bg.
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#6c7086'
+
+# Entire CLI: no OS keyring in this session, store tokens in ~/.config/entire/tokens.json (0600)
+export ENTIRE_TOKEN_STORE=file
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/laterabhi/google-cloud-sdk/path.zsh.inc' ]; then . '/home/laterabhi/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/laterabhi/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/laterabhi/google-cloud-sdk/completion.zsh.inc'; fi

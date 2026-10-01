@@ -1,0 +1,16 @@
+#!/bin/sh
+# systemd-backlight restores the value the register already holds at power-on
+# (max), amdgpu treats that write as a no-op, and the panel PWM is never
+# started: brightness reads max while actual_brightness stays 0 and the screen
+# looks dead. Writing a *different* value first forces the reprogram.
+set -eu
+b=/sys/class/backlight/amdgpu_bl1
+[ -w "$b/brightness" ] || exit 0
+m=$(cat "$b/max_brightness")
+cur=$(cat "$b/brightness")
+# Must end on a value different from the power-on register value.
+[ "$cur" -ge "$m" ] && cur=$((m - 1))
+[ "$cur" -lt 1 ] && cur=$((m / 2))
+printf '%s' "$((m / 2))" > "$b/brightness"
+printf '%s' "$cur" > "$b/brightness"
+logger -t amdgpu-backlight-nudge "max=$m set=$cur actual=$(cat "$b/actual_brightness" 2>/dev/null)"

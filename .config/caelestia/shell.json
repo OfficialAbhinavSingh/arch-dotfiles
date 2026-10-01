@@ -1,0 +1,17 @@
+{
+    "appearance": {
+        "transparency": {
+            "enabled": false
+        }
+    },
+    "general": {
+        "idle": {
+            "inhibitWhenAudio": true,
+            "inhibitWhenCharging": true,
+            "lockBeforeSleep": true
+        }
+    },
+    "paths": {
+        "wallpaperDir": "~/Pictures/wallpapers/caelestia-pack"
+    }
+}

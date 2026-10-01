@@ -1,0 +1,11 @@
+[Unit]
+Description=Fallback desktop when caelestia-shell is unavailable
+# Triggered by caelestia-shell.service's OnFailure=, i.e. only after Restart=
+# has exhausted StartLimitBurst and systemd has given up.
+
+[Service]
+Type=oneshot
+ExecStart=/home/laterabhi/.local/bin/caelestia-fallback caelestia-shell.service failed
+RemainAfterExit=yes
+# Cancelled mid-run when the shell recovers; that is not a fault.
+SuccessExitStatus=SIGTERM

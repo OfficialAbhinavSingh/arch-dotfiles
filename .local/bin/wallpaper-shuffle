@@ -1,20 +1,22 @@
 #!/bin/bash
-# Shuffles through the active wallpaper pack on an interval via awww.
-# Default pack: jjk-gojo-pack. Override with WALLDIR env var.
+# Shuffles to a random wallpaper from the active pack.
+#
+# caelestia picks and draws the wallpaper (it owns the background layer and
+# regenerates the shell's material-you scheme from the image), then
+# caelestia-theme re-runs wallust so rofi/kitty follow the same image.
+#
+# Default pack: caelestia-pack. Override with WALLDIR, e.g.
+#   WALLDIR=~/Pictures/wallpapers/jjk-gojo-pack wallpaper-shuffle
 
-WALLDIR="${WALLDIR:-$HOME/Pictures/wallpapers/jjk-gojo-pack}"
-INTERVAL="${INTERVAL:-600}"
+WALLDIR="${WALLDIR:-$HOME/Pictures/wallpapers/caelestia-pack}"
 
-set_random() {
-    local wall
-    wall=$(find "$WALLDIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
-    if [ -z "$wall" ]; then
-        echo "No wallpaper found in $WALLDIR" >&2
-        return 1
-    fi
-    awww img "$wall"
-    wallust run -s -d ~/.config/wallust/ "$wall" 2>/dev/null  # -s: never push palette sequences into live terminals (kitty.conf owns terminal colors)
-    killall -SIGUSR2 waybar 2>/dev/null
-}
+if [ ! -d "$WALLDIR" ]; then
+    echo "wallpaper-shuffle: no such pack: $WALLDIR" >&2
+    exit 1
+fi
 
-set_random
+# -n: don't filter by size. The old awww path never filtered either, and
+# caelestia's default threshold silently rejects packs of small images.
+caelestia wallpaper -n -r "$WALLDIR" || exit 1
+
+~/.local/bin/caelestia-theme

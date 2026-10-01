@@ -9,7 +9,8 @@ if [ -z "$wall" ]; then
 fi
 
 # Set wallpaper
-awww img "$wall"
+caelestia wallpaper -n -f "$wall"
+~/.local/bin/caelestia-theme "$wall"
 
 # Generate colors using the config directory
 wallust run -d ~/.config/wallust/ "$wall"
