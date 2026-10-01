@@ -1,0 +1,6 @@
+[Unit]
+Description=Clear the npm download cache
+
+[Service]
+Type=oneshot
+ExecStart=/home/laterabhi/.local/bin/clean-npm-cache

@@ -21,9 +21,7 @@ stop() {
 }
 
 restore_static() {
-    local wall
-    wall=$(find ~/Pictures/wallpapers/jjk-gojo-pack -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
-    [ -n "$wall" ] && awww img "$wall" 2>/dev/null
+    ~/.local/bin/wallpaper-shuffle 2>/dev/null
 }
 
 case "$1" in
@@ -45,6 +43,9 @@ fi
 
 stop
 # -f fork to background, -p auto-pause when a fullscreen window covers it (saves battery)
-mpvpaper -f -p -o "$MPV_OPTS" "$MON" "$vid"
+# -l bottom is REQUIRED: caelestia draws its own opaque surface on the
+# `background` layer, so an mpvpaper on the default layer is completely hidden.
+# `bottom` sits above it and still stays below every window.
+mpvpaper -f -p -l bottom -o "$MPV_OPTS" "$MON" "$vid"
 
 notify-send "Live Wallpaper" "Now playing $(basename "$vid")" 2>/dev/null

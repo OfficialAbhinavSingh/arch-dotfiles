@@ -1,0 +1,23 @@
+#!/bin/bash
+# Re-theme everything that follows the wallpaper.
+#
+# caelestia owns the background layer and derives the shell's material-you
+# palette itself, so the only thing left to do is re-run wallust for the
+# targets that live outside the shell (rofi, kitty).
+#
+# Usage: caelestia-theme [/path/to/wallpaper]
+#        with no argument, themes whatever caelestia currently has set.
+
+wall="$1"
+
+if [ -z "$wall" ]; then
+    wall=$(caelestia shell wallpaper get 2>/dev/null)
+fi
+
+if [ -z "$wall" ] || [ ! -f "$wall" ]; then
+    echo "caelestia-theme: no readable wallpaper (got '${wall:-<empty>}')" >&2
+    exit 1
+fi
+
+# -s: never push palette sequences into live terminals (kitty.conf owns terminal colors)
+wallust run -s -d ~/.config/wallust/ "$wall" 2>/dev/null

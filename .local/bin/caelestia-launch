@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Start caelestia-shell and make sure the desktop is never a mystery black screen.
+#
+# History behind each guard:
+#   2026-09-07  hyprlock and caelestia both grabbed ext-session-lock-v1; the loser
+#               got `finished` and quickshell exited silently, mid-session.
+#   2026-09-08  qt6-base 6.11.1 -> 6.11.2 moved a symbol off the private version
+#               node, so the AUR-built `qs` failed to link and never started.
+# Both showed up only as a black screen, because caelestia draws the bar AND the
+# wallpaper. So: check the binary can load, hand the process to systemd (which
+# restarts it if it dies again), then confirm it actually rendered.
+
+set -uo pipefail
+
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/caelestia-launch"
+LOG="$STATE/launch.log"
+mkdir -p "$STATE"
+log() { printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >>"$LOG"; }
+
+UNIT=caelestia-shell.service
+
+shell_is_up() {
+    pgrep -x qs >/dev/null 2>&1 &&
+        hyprctl layers 2>/dev/null | grep -q 'caelestia-background'
+}
+
+# 1. ABI health check. Same probe the packaged pacman hook runs after a qt6
+#    upgrade. If it fails, restarting is pointless - go straight to fallback and
+#    do not let systemd burn through its start limit.
+if ! /usr/bin/quickshell --private-check-compat >/dev/null 2>&1; then
+    log "ABI mismatch, not starting $UNIT"
+    exec "$HOME/.local/bin/caelestia-fallback" --now "quickshell/Qt ABI mismatch"
+fi
+
+# 2. Refresh the compositor variables in the systemd user manager. They are
+#    already imported in a normal boot, but HYPRLAND_INSTANCE_SIGNATURE changes
+#    every time Hyprland restarts, and a stale one makes the unit start against
+#    a compositor that no longer exists.
+systemctl --user import-environment \
+    WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP 2>/dev/null
+
+# 3. Clear anything started outside systemd (e.g. a manual `caelestia shell -d`),
+#    otherwise `qs -n` sees a duplicate and exits straight away.
+if pgrep -x qs >/dev/null 2>&1; then
+    log "killing pre-existing out-of-unit shell"
+    caelestia shell -k >/dev/null 2>&1
+    sleep 1
+    pkill -x qs 2>/dev/null
+    sleep 1
+fi
+
+log "starting $UNIT"
+systemctl --user reset-failed "$UNIT" 2>/dev/null
+systemctl --user start "$UNIT" 2>>"$LOG"
+
+# 4. Confirm it actually rendered. A clean exit code is not proof: on 2026-09-07
+#    `caelestia shell -d` returned 0 and the shell was gone seconds later.
+for _ in $(seq 1 20); do
+    if shell_is_up; then
+        "$HOME/.local/bin/caelestia-fallback" --stop
+        log "up"
+        exit 0
+    fi
+    sleep 0.5
+done
+
+log "did not come up within 10s"
+exec "$HOME/.local/bin/caelestia-fallback" --now "shell did not come up within 10s"

@@ -1,0 +1,11 @@
+[Unit]
+Description=Clear npm cache weekly
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+RandomizedDelaySec=1h
+Unit=npm-cache-maintenance.service
+
+[Install]
+WantedBy=timers.target

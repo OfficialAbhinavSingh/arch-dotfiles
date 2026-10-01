@@ -1,0 +1,13 @@
+// us + us(dvp) as before, but Right Alt is a plain backtick key.
+// RALT stops being a modifier entirely: `replace key` drops its Alt_R keysym,
+// so the compat rules never bind it to Mod1. Shift+RightAlt gives ~.
+xkb_keymap {
+    xkb_keycodes { include "evdev+aliases(qwerty)" };
+    xkb_types    { include "complete" };
+    xkb_compat   { include "complete" };
+    xkb_symbols  {
+        include "pc+us+us(dvp):2+inet(evdev)"
+        replace key <RALT> { type[Group1]="TWO_LEVEL", [ grave, asciitilde ] };
+    };
+    xkb_geometry { include "pc(pc105)" };
+};

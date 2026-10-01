@@ -54,6 +54,19 @@ hl.bind(mainMod .. " + J", hl.dsp.exec_cmd("wl-kbptr-toggle"))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.exec_cmd("wl-kbptr-toggle right"))
 hl.bind("ALT + Shift_L", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
 
+-- ── caelestia shell drawers ──────────────────────────────────────────────────
+-- Drawer names come from `caelestia shell drawers list`.
+-- rofi (SUPER+R) and the old power-menu (SUPER+M) are deliberately left alone
+-- so there is a working fallback if quickshell is not running.
+local cae = function(cmd) return hl.dsp.exec_cmd("caelestia shell " .. cmd) end
+hl.bind(mainMod .. " + Space",         cae("drawers toggle launcher"))
+hl.bind(mainMod .. " + SHIFT + D",     cae("drawers toggle dashboard"))
+hl.bind(mainMod .. " + SHIFT + N",     cae("drawers toggle sidebar"))
+hl.bind(mainMod .. " + SHIFT + U",     cae("drawers toggle utilities"))
+hl.bind(mainMod .. " + SHIFT + Escape", cae("drawers toggle session"))
+hl.bind(mainMod .. " + SHIFT + I",     cae("idleInhibitor toggle"))
+hl.bind(mainMod .. " + CTRL + N",      cae("notifs toggleDnd"))
+
 -- ── System info floating window ─────────────────────────────────────────────
 -- neofetch was archived upstream; fastfetch is the maintained replacement.
 -- Window title stays "neofetch" so the rules below keep matching.
@@ -69,7 +82,10 @@ hl.bind(mainMod .. " + K",     hl.dsp.focus({ direction = "up" }))
 -- SUPER+L is the lockscreen, SUPER+J is wl-kbptr; use arrows for right/down.
 
 -- ── Lockscreen ───────────────────────────────────────────────────────────────
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
+-- caelestia owns the lock (IPC target `lock`, see `caelestia shell -s`). It was
+-- hyprlock here, but running both put two clients on ext-session-lock-v1 and
+-- killed the shell whenever hyprlock won the race.
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("caelestia shell lock lock"))
 
 -- ── Window management ────────────────────────────────────────────────────────
 -- Move the focused window within the layout
@@ -90,7 +106,7 @@ hl.bind(mainMod .. " + CTRL + Return", hl.dsp.window.center())
 -- Reload this config without logging out
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("hyprctl reload"))
 -- Show/hide the bar
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("caelestia shell drawers toggle bar"))
 
 -- ── Workspace switching / move window to workspace ───────────────────────────
 for i = 1, 10 do
@@ -98,6 +114,13 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + " .. key,           hl.dsp.focus({ workspace = i }))
     hl.bind(mainMod .. " + SHIFT + " .. key,   hl.dsp.window.move({ workspace = i }))
 end
+
+-- The loop above stops at 10, so workspaces 11+ (created by `movetoworkspace`
+-- or a window rule) have no key of their own. `e+1`/`e-1` step through the
+-- workspaces that actually exist, skipping empties and special:scratchpad, so
+-- these reach any number without needing a key per workspace.
+hl.bind(mainMod .. " + CTRL + Right", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + CTRL + Left",  hl.dsp.focus({ workspace = "e-1" }))
 
 -- ── Mouse workspace scroll ───────────────────────────────────────────────────
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
@@ -214,6 +237,10 @@ hl.config({
     },
 
     input = {
+        -- kb_file wins over kb_layout/kb_variant when set. This file is the same
+        -- us + us(dvp) pair, with Right Alt replaced by a plain backtick key
+        -- (Shift+RightAlt = ~), because this keyboard has no grave key.
+        kb_file            = "/home/laterabhi/.config/hypr/keymap-ralt-grave.xkb",
         kb_layout          = "us,us",
         kb_variant         = ",dvp",
         numlock_by_default = true,
@@ -305,15 +332,24 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("powerprofilesctl set balanced")
 
     hl.exec_cmd("hypridle")
-    hl.exec_cmd("waybar")
+
+    -- caelestia (quickshell) replaces waybar as the bar/OSD/launcher/dashboard.
+    -- Detached so it survives a `hyprctl reload`. Old bar: hl.exec_cmd("waybar")
+    --
+    -- Launched through a wrapper, NOT `caelestia shell -d` directly: caelestia
+    -- owns the wallpaper as well as the bar, so when quickshell fails to start
+    -- the desktop is a featureless black rectangle with no clue why. The wrapper
+    -- health-checks the binary, confirms the background layer actually appeared,
+    -- and otherwise falls back to waybar + hyprpaper and says what broke.
+    hl.exec_cmd("~/.local/bin/caelestia-launch")
 
     -- swaync is NOT started here. It owns the org.freedesktop.Notifications bus
     -- name, so starting it by hand raced its own D-Bus activation and left
     -- swaync.service in start-limit-hit. systemd --user owns it now.
 
-    -- One wallpaper daemon. hyprpaper was removed: wallpaper-shuffle,
-    -- SUPER+W and live-wallpaper all drive awww.
-    hl.exec_cmd("awww-daemon")
+    -- caelestia owns the background layer and draws the wallpaper itself, so
+    -- awww-daemon is no longer started (it rendered *underneath* caelestia and
+    -- was invisible). wallpaper-shuffle now drives caelestia + wallust.
     hl.exec_cmd("~/.local/bin/wallpaper-shuffle")
 
     -- nm-applet and blueman-applet were removed: waybar has native network and

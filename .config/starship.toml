@@ -22,7 +22,10 @@ palette = 'catppuccin_mocha'
 add_newline = true
 # Never let a slow module stall the prompt.
 command_timeout = 500
-scan_timeout = 10
+# 10ms was too low for $HOME: it is a git repo whose subdirs are symlinks into
+# /data, so the module scan blew the budget and starship printed
+# "Scanning current directory timed out" on every prompt here.
+scan_timeout = 100
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"

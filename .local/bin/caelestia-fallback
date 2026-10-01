@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# Fallback desktop for when caelestia-shell cannot run.
+#
+# caelestia owns the bar AND the wallpaper (wayland `background` layer), so a
+# dead shell leaves a featureless black rectangle with no clue what went wrong.
+# This puts a usable desktop up instead and says why.
+#
+#   caelestia-fallback [reason]   start fallback
+#   caelestia-fallback --stop     tear it down
+
+set -uo pipefail
+
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/caelestia-launch"
+LOG="$STATE/launch.log"
+mkdir -p "$STATE"
+log() { printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >>"$LOG"; }
+
+if [ "${1:-}" = "--stop" ]; then
+    # Stop the unit first: waybar and awww live in its cgroup, so this reaps them
+    # AND clears RemainAfterExit=yes, which would otherwise leave the unit sitting
+    # "active" with nothing running. --no-block because this is called from
+    # caelestia-shell.service's ExecStartPost and a blocking job would deadlock.
+    systemctl --user --no-block stop caelestia-fallback.service 2>/dev/null
+    # Stopping it mid-run leaves Result=signal; that is a deliberate cancel, not
+    # a fault, so do not leave a failed unit lying around to confuse diagnosis.
+    systemctl --user reset-failed caelestia-fallback.service 2>/dev/null
+    # Then catch any fallback started by hand, outside systemd.
+    sleep 1
+    pkill -x waybar 2>/dev/null
+    pkill -x awww-daemon 2>/dev/null
+    log "fallback stopped"
+    exit 0
+fi
+
+# --now skips the grace period, for callers that already know the shell cannot
+# come up (e.g. a Qt ABI mismatch).
+immediate=0
+if [ "${1:-}" = "--now" ]; then
+    immediate=1
+    shift
+fi
+
+reason="${1:-caelestia-shell.service failed}"
+
+# Grace period. OnFailure= fires on ANY failed start, including the ordinary
+# crash that Restart=always is about to recover from two seconds later. Without
+# this, every transient crash flashes a waybar on screen and then yanks it away.
+# A genuinely dead shell never comes back, so waiting costs nothing there.
+if [ "$immediate" -eq 0 ]; then
+    for _ in $(seq 1 16); do
+        if pgrep -x qs >/dev/null 2>&1 &&
+            hyprctl layers 2>/dev/null | grep -q 'caelestia-background'; then
+            log "shell recovered on its own; fallback not needed"
+            exit 0
+        fi
+        sleep 0.5
+    done
+fi
+
+log "FALLBACK: $reason"
+
+# Wallpaper. Uses awww, NOT hyprpaper: hyprpaper 0.8.4-8 under Hyprland 0.56.2
+# logs "Monitor eDP-1 has no target: no wp will be created" and creates no layer
+# at all, both with `wallpaper = ,path` and with an explicit `wallpaper = eDP-1,path`.
+wp="$(readlink -f "${XDG_STATE_HOME:-$HOME/.local/state}/caelestia/wallpaper/current" 2>/dev/null)"
+[ -n "$wp" ] && [ -f "$wp" ] || wp="$HOME/Pictures/wallpapers/anime/anime_cafe_tokyonight.png"
+
+if ! pgrep -x awww-daemon >/dev/null 2>&1; then
+    awww-daemon >/dev/null 2>&1 &
+    sleep 2
+fi
+[ -f "$wp" ] && awww img "$wp" >/dev/null 2>&1
+
+pgrep -x waybar >/dev/null 2>&1 || waybar >/dev/null 2>&1 &
+
+# Say what actually went wrong. Until 2026-09-11 this banner unconditionally read
+# "run qs-fix", which is the remedy for exactly one of the three ways the shell
+# dies - and it was showing that advice during an OOM kill, where rebuilding
+# quickshell is useless and the real problem is a test run eating all of RAM.
+classify() {
+    # 1. Qt ABI break. quickshell links Qt private API, so a qt6-base minor bump
+    #    can stop the installed binary loading with no source change at all.
+    if ! quickshell --private-check-compat >/dev/null 2>&1; then
+        printf 'Qt ABI mismatch|rebuild quickshell:  qs-fix'
+        return
+    fi
+    # 2. OOM kill. earlyoom runs as a system service, so look in the system log.
+    #    -q on journalctl: we only care whether a matching line exists.
+    if journalctl -u earlyoom --since '-3 minutes' --no-pager 2>/dev/null |
+        grep -qE 'sending SIGKILL to process [0-9]+ uid '"$(id -u)"' "qs"'; then
+        printf 'out of memory|cap heavy jobs:  devrun pytest ...'
+        return
+    fi
+    if journalctl -k --since '-3 minutes' --no-pager 2>/dev/null |
+        grep -qiE 'Out of memory: Killed process .*(qs|quickshell)'; then
+        printf 'out of memory|cap heavy jobs:  devrun pytest ...'
+        return
+    fi
+    # 3. Anything else - a QML error, a missing dependency, a config typo.
+    printf 'startup failure|check:  journalctl --user -u caelestia-shell -e'
+}
+
+verdict="$(classify)"
+cause="${verdict%%|*}"
+remedy="${verdict#*|}"
+log "diagnosis: $cause -> $remedy"
+
+# hyprctl notify, not notify-send: swaync is masked and caelestia (which would
+# otherwise serve notifications) is by definition not running here.
+hyprctl notify 3 20000 "rgb(ff5555)" "caelestia down ($cause) - fallback bar active. $remedy" >/dev/null 2>&1

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+npm_bin="$(command -v npm)"
+cache_dir="$("$npm_bin" config get cache)"
+printf 'Cleaning npm cache at %s\n' "$cache_dir"
+"$npm_bin" cache clean --force
