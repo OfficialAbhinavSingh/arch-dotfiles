@@ -1,0 +1,20 @@
+[Unit]
+Description=impasto (quickshell desktop shell) [test]
+Documentation=https://github.com/andreumassanet/impasto
+# Deliberately NOT WantedBy/After=graphical-session.target, same reason as
+# caelestia-shell.service: uwsm does not manage this session. impasto-launch,
+# called from the hyprland.start block in hyprland.lua, starts this unit.
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+[Service]
+Type=simple
+# Same ABI guard as caelestia-shell.service: qt6-base minor bumps move symbols
+# between version nodes, so a built qs binary can stop loading with no source
+# change at all.
+ExecStartPre=/usr/bin/quickshell --private-check-compat
+# Foreground, no -d: systemd must own the process to be able to restart it.
+# -n exits immediately if another instance of this config is already running.
+ExecStart=/usr/bin/qs -c impasto -n
+Restart=always
+RestartSec=2

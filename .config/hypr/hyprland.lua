@@ -45,7 +45,7 @@ hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("~/.config/hypr/scripts/DarkLight.sh 
 hl.bind(mainMod .. " + O", hl.dsp.workspace.move({ monitor = "+1" }))
 hl.bind(mainMod .. " + Slash", hl.dsp.exec_cmd("~/.local/bin/keybinds-hint.sh"))
 hl.bind(mainMod .. " + Period", hl.dsp.exec_cmd("rofi -show emoji -modi emoji"))
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd([[kitty --title "ai" sh -c "echo '🤖 Ask your local AI:'; read -p '> ' prompt; ~/.local/bin/ai \"\$prompt\"; read"]]))
+hl.bind(mainMod .. " + ALT + A", hl.dsp.exec_cmd([[kitty --title "ai" sh -c "echo '🤖 Ask your local AI:'; read -p '> ' prompt; ~/.local/bin/ai \"\$prompt\"; read"]]))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.local/bin/wallpaper-shuffle"))
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.local/bin/live-wallpaper"))
 hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("~/.local/bin/live-wallpaper stop"))
@@ -59,13 +59,40 @@ hl.bind("ALT + Shift_L", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
 -- rofi (SUPER+R) and the old power-menu (SUPER+M) are deliberately left alone
 -- so there is a working fallback if quickshell is not running.
 local cae = function(cmd) return hl.dsp.exec_cmd("caelestia shell " .. cmd) end
-hl.bind(mainMod .. " + Space",         cae("drawers toggle launcher"))
+local function open_launcher()
+    hl.dispatch(hl.dsp.global("quickshell:launcher"))
+    hl.dispatch(hl.dsp.exec_cmd("caelestia shell drawers toggle launcher"))
+end
+hl.bind(mainMod .. " + Space", open_launcher)
 hl.bind(mainMod .. " + SHIFT + D",     cae("drawers toggle dashboard"))
 hl.bind(mainMod .. " + SHIFT + N",     cae("drawers toggle sidebar"))
 hl.bind(mainMod .. " + SHIFT + U",     cae("drawers toggle utilities"))
 hl.bind(mainMod .. " + SHIFT + Escape", cae("drawers toggle session"))
 hl.bind(mainMod .. " + SHIFT + I",     cae("idleInhibitor toggle"))
 hl.bind(mainMod .. " + CTRL + N",      cae("notifs toggleDnd"))
+
+-- ── impasto shell (test, Quickshell global shortcuts) ───────────────────────
+-- Only fires when a quickshell config that registers these names is running
+-- (currently `qs -c impasto`, started manually, not at session start). No-op
+-- when it isn't, since the portal has nothing registered under that name.
+-- Kept off plain SUPER+<letter> entirely: that space already belongs to the
+-- binds above. Remove this block (or stop the impasto shell) to fully revert.
+-- Launcher is on plain SUPER+Space below (works for both shells), not here.
+hl.bind(mainMod .. " + A",               hl.dsp.global("quickshell:controls"))
+hl.bind(mainMod .. " + ALT + Tab",       hl.dsp.global("quickshell:overview"))
+hl.bind(mainMod .. " + ALT + Comma",     hl.dsp.global("quickshell:settings"))
+hl.bind(mainMod .. " + ALT + T",         hl.dsp.global("quickshell:appearance"))
+hl.bind(mainMod .. " + ALT + SHIFT + T", hl.dsp.global("quickshell:palette"))
+hl.bind(mainMod .. " + ALT + U",         hl.dsp.global("quickshell:stats"))
+hl.bind(mainMod .. " + ALT + P",         hl.dsp.global("quickshell:pet"))
+hl.bind(mainMod .. " + ALT + G",         hl.dsp.global("quickshell:games"))
+hl.bind(mainMod .. " + ALT + N",         hl.dsp.global("quickshell:notes"))
+hl.bind(mainMod .. " + ALT + K",         hl.dsp.global("quickshell:board"))
+hl.bind(mainMod .. " + ALT + H",         hl.dsp.global("quickshell:keys"))
+-- Lock is on plain SUPER+L below (works for both shells), not duplicated here.
+hl.bind(mainMod .. " + ALT + X",         hl.dsp.global("quickshell:session"))
+hl.bind(mainMod .. " + ALT + V",         hl.dsp.global("quickshell:clipboard"))
+hl.bind(mainMod .. " + ALT + I",         hl.dsp.global("quickshell:packages"))
 
 -- ── System info floating window ─────────────────────────────────────────────
 -- neofetch was archived upstream; fastfetch is the maintained replacement.
@@ -82,10 +109,18 @@ hl.bind(mainMod .. " + K",     hl.dsp.focus({ direction = "up" }))
 -- SUPER+L is the lockscreen, SUPER+J is wl-kbptr; use arrows for right/down.
 
 -- ── Lockscreen ───────────────────────────────────────────────────────────────
--- caelestia owns the lock (IPC target `lock`, see `caelestia shell -s`). It was
+-- Whichever quickshell config is actually running owns the lock. It was
 -- hyprlock here, but running both put two clients on ext-session-lock-v1 and
 -- killed the shell whenever hyprlock won the race.
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("caelestia shell lock lock"))
+-- caelestia has no portal-registered global shortcuts (CLI only: `caelestia
+-- shell lock lock`); impasto has no CLI (portal only: `quickshell:lock`).
+-- Firing both keeps SUPER+L correct for whichever one is actually running --
+-- the other call just errors silently against a shell that isn't there.
+local function lock_screen()
+    hl.dispatch(hl.dsp.global("quickshell:lock"))
+    hl.dispatch(hl.dsp.exec_cmd("caelestia shell lock lock"))
+end
+hl.bind(mainMod .. " + L", lock_screen)
 
 -- ── Window management ────────────────────────────────────────────────────────
 -- Move the focused window within the layout
@@ -333,24 +368,23 @@ hl.on("hyprland.start", function()
 
     hl.exec_cmd("hypridle")
 
-    -- caelestia (quickshell) replaces waybar as the bar/OSD/launcher/dashboard.
-    -- Detached so it survives a `hyprctl reload`. Old bar: hl.exec_cmd("waybar")
-    --
-    -- Launched through a wrapper, NOT `caelestia shell -d` directly: caelestia
-    -- owns the wallpaper as well as the bar, so when quickshell fails to start
-    -- the desktop is a featureless black rectangle with no clue why. The wrapper
-    -- health-checks the binary, confirms the background layer actually appeared,
-    -- and otherwise falls back to waybar + hyprpaper and says what broke.
-    hl.exec_cmd("~/.local/bin/caelestia-launch")
+    -- impasto (quickshell), testing as the daily driver in place of caelestia.
+    -- To revert: comment the impasto-launch line below and uncomment the two
+    -- caelestia lines. Nothing about caelestia's own config was touched --
+    -- caelestia-shell.service and ~/.config/quickshell/caelestia/ are untouched,
+    -- just not auto-started.
+    -- hl.exec_cmd("~/.local/bin/caelestia-launch")
+    hl.exec_cmd("~/.local/bin/impasto-launch")
 
     -- swaync is NOT started here. It owns the org.freedesktop.Notifications bus
     -- name, so starting it by hand raced its own D-Bus activation and left
     -- swaync.service in start-limit-hit. systemd --user owns it now.
 
     -- caelestia owns the background layer and draws the wallpaper itself, so
-    -- awww-daemon is no longer started (it rendered *underneath* caelestia and
-    -- was invisible). wallpaper-shuffle now drives caelestia + wallust.
-    hl.exec_cmd("~/.local/bin/wallpaper-shuffle")
+    -- awww-daemon is no longer started by wallpaper-shuffle; impasto-launch
+    -- starts awww-daemon itself instead. Re-enable this when reverting to
+    -- caelestia.
+    -- hl.exec_cmd("~/.local/bin/wallpaper-shuffle")
 
     -- nm-applet and blueman-applet were removed: waybar has native network and
     -- bluetooth modules, and those two GTK trays cost ~70MB for a duplicate UI.

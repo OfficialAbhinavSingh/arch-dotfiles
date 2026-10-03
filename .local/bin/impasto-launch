@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Start impasto-shell via systemd, with the same guards caelestia-launch uses
+# (see that script for the incident history behind each one). Test rice: no
+# waybar-style fallback if it fails to come up.
+
+set -uo pipefail
+
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/impasto-launch"
+LOG="$STATE/launch.log"
+mkdir -p "$STATE" "$HOME/.cache/awww"
+log() { printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >>"$LOG"; }
+
+UNIT=impasto-shell.service
+
+shell_is_up() {
+    pgrep -x qs >/dev/null 2>&1
+}
+
+# 1. ABI health check, same probe caelestia-launch runs.
+if ! /usr/bin/quickshell --private-check-compat >/dev/null 2>&1; then
+    log "ABI mismatch, not starting $UNIT"
+    exit 1
+fi
+
+# 2. Refresh compositor variables in the systemd user manager.
+systemctl --user import-environment \
+    WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP 2>/dev/null
+
+# 3. impasto needs awww-daemon running to paint the wallpaper; caelestia's
+#    setup stopped it since caelestia draws its own background layer.
+pgrep -x awww-daemon >/dev/null 2>&1 || nohup awww-daemon >"$STATE/awww-daemon.log" 2>&1 &
+
+# 4. Clear anything started outside systemd, otherwise `qs -n` sees a
+#    duplicate and exits straight away.
+if pgrep -x qs >/dev/null 2>&1; then
+    log "killing pre-existing out-of-unit shell"
+    pkill -x qs 2>/dev/null
+    sleep 1
+fi
+
+log "starting $UNIT"
+systemctl --user reset-failed "$UNIT" 2>/dev/null
+systemctl --user start "$UNIT" 2>>"$LOG"
+
+# 5. Confirm it actually rendered.
+for _ in $(seq 1 20); do
+    if shell_is_up; then
+        log "up"
+        exit 0
+    fi
+    sleep 0.5
+done
+
+log "did not come up within 10s"
+exit 1
