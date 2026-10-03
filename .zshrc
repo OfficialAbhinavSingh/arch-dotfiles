@@ -180,3 +180,26 @@ if [ -f '/home/laterabhi/google-cloud-sdk/path.zsh.inc' ]; then . '/home/laterab
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/laterabhi/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/laterabhi/google-cloud-sdk/completion.zsh.inc'; fi
+
+# ── impasto greeting ──────────────────────────────────────────────────────
+# fastfetch with the greeting scene chosen in quickshell's settings.
+# fastfetch's config points at the chosen scene; "random" is resolved here.
+# `fa koi` forces a scene. From github.com/andreumassanet/impasto .zshrc.
+function fa() {
+    local dir="${XDG_STATE_HOME:-$HOME/.local/state}/quickshell" choice=""
+    if [[ -n "$1" && "$1" != -* ]]; then
+        if [[ ! -f "$dir/greeting-$1.gif" ]]; then
+            print -u2 "fa: no scene called $1 — lava, critters, koi, invaders"
+            return 1
+        fi
+        fastfetch --logo "$dir/greeting-$1.gif"
+        return
+    fi
+    [[ -r "$dir/greeting" ]] && choice="$(<"$dir/greeting")"
+    local scenes=("$dir"/greeting-*.gif(N))
+    if [[ "$choice" == random ]] && (( $#scenes )); then
+        fastfetch --logo "${scenes[RANDOM % $#scenes + 1]}" "$@"
+    else
+        fastfetch "$@"
+    fi
+}
