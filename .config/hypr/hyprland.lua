@@ -157,6 +157,19 @@ end
 hl.bind(mainMod .. " + CTRL + Right", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + CTRL + Left",  hl.dsp.focus({ workspace = "e-1" }))
 
+-- Only workspaces 1-10 are pinned to a monitor (workspaces.lua) and have a
+-- key of their own above. Nothing should ever end up past 10 -- caught Zen
+-- doing exactly that (session-restore racing which workspace was focused at
+-- window-creation time, landing on 11 with nothing in this config targeting
+-- it there). Catch it generally, for any app, not just Zen: bounce any
+-- window that opens on workspace 11+ back to 1 immediately.
+hl.on("window.open", function(window)
+    local ws = window.workspace
+    if ws and not ws.special and ws.id and ws.id > 10 then
+        hl.dispatch(hl.dsp.window.move({ workspace = 1 }))
+    end
+end)
+
 -- ── Mouse workspace scroll ───────────────────────────────────────────────────
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
@@ -323,6 +336,13 @@ end)
 
 -- ── Window rules ──────────────────────────────────────────────────────────────
 
+-- Zen keeps landing new windows on whatever workspace happens to be active
+-- when its own session-restore finishes creating them (observed: workspace
+-- 11, with nothing in this config targeting it there) instead of wherever it
+-- was opened. Forcing it to 1 makes placement deterministic regardless of
+-- that race, same pattern as kitty-pad's scratchpad pin below.
+hl.window_rule({ match = { class = "^(zen)$" }, workspace = "1" })
+
 -- Terminal: no Hyprland-side transparency. kitty does its own via
 -- background_opacity in ~/.config/kitty/kitty.conf; the two multiply, so
 -- pinning Hyprland to 1.0 keeps kitty.conf the single source of truth.
@@ -394,4 +414,10 @@ hl.on("hyprland.start", function()
 
     -- Zen Terminal, hidden in the scratchpad
     hl.exec_cmd("kitty --class kitty-pad", { workspace = "special:scratchpad silent" })
+
+    -- Nothing above targets a workspace explicitly except the scratchpad
+    -- terminal (silent, doesn't steal focus), but whichever one last grabs
+    -- focus during startup is whatever you land on -- not guaranteed to be 1.
+    -- Force it, last, so login always starts on workspace 1.
+    hl.dispatch(hl.dsp.focus({ workspace = 1 }))
 end)
