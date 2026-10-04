@@ -46,12 +46,10 @@ hl.bind(mainMod .. " + O", hl.dsp.workspace.move({ monitor = "+1" }))
 hl.bind(mainMod .. " + Slash", hl.dsp.exec_cmd("~/.local/bin/keybinds-hint.sh"))
 hl.bind(mainMod .. " + Period", hl.dsp.exec_cmd("rofi -show emoji -modi emoji"))
 hl.bind(mainMod .. " + ALT + A", hl.dsp.exec_cmd([[kitty --title "ai" sh -c "echo '🤖 Ask your local AI:'; read -p '> ' prompt; ~/.local/bin/ai \"\$prompt\"; read"]]))
--- caelestia-era wallpaper scripts, not wired to impasto's awww pipeline.
--- Dead while impasto is the daily driver. Use impasto's own wallpaper picker
--- (SUPER+ALT+T appearance) instead. Re-enable if reverting to caelestia.
--- hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.local/bin/wallpaper-shuffle"))
--- hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.local/bin/live-wallpaper"))
--- hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("~/.local/bin/live-wallpaper stop"))
+-- caelestia-era wallpaper-shuffle/live-wallpaper scripts removed: confirmed
+-- not working, not wired to impasto's awww pipeline. Use impasto's own
+-- wallpaper picker instead (SUPER+ALT+T appearance), which supports motion
+-- wallpapers via mpvpaper natively.
 hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd([[kitty --title "maintenance" sh -c "~/.local/bin/arch-maintenance.sh; read"]]))
 hl.bind(mainMod .. " + J", hl.dsp.exec_cmd("wl-kbptr-toggle"))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.exec_cmd("wl-kbptr-toggle right"))
@@ -410,11 +408,8 @@ hl.on("hyprland.start", function()
     -- name, so starting it by hand raced its own D-Bus activation and left
     -- swaync.service in start-limit-hit. systemd --user owns it now.
 
-    -- caelestia owns the background layer and draws the wallpaper itself, so
-    -- awww-daemon is no longer started by wallpaper-shuffle; impasto-launch
-    -- starts awww-daemon itself instead. Re-enable this when reverting to
-    -- caelestia.
-    -- hl.exec_cmd("~/.local/bin/wallpaper-shuffle")
+    -- impasto-launch starts awww-daemon itself; wallpaper-shuffle removed
+    -- (caelestia-only, confirmed not working).
 
     -- nm-applet and blueman-applet were removed: waybar has native network and
     -- bluetooth modules, and those two GTK trays cost ~70MB for a duplicate UI.
