@@ -46,9 +46,12 @@ hl.bind(mainMod .. " + O", hl.dsp.workspace.move({ monitor = "+1" }))
 hl.bind(mainMod .. " + Slash", hl.dsp.exec_cmd("~/.local/bin/keybinds-hint.sh"))
 hl.bind(mainMod .. " + Period", hl.dsp.exec_cmd("rofi -show emoji -modi emoji"))
 hl.bind(mainMod .. " + ALT + A", hl.dsp.exec_cmd([[kitty --title "ai" sh -c "echo '🤖 Ask your local AI:'; read -p '> ' prompt; ~/.local/bin/ai \"\$prompt\"; read"]]))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.local/bin/wallpaper-shuffle"))
-hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.local/bin/live-wallpaper"))
-hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("~/.local/bin/live-wallpaper stop"))
+-- caelestia-era wallpaper scripts, not wired to impasto's awww pipeline.
+-- Dead while impasto is the daily driver. Use impasto's own wallpaper picker
+-- (SUPER+ALT+T appearance) instead. Re-enable if reverting to caelestia.
+-- hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.local/bin/wallpaper-shuffle"))
+-- hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.local/bin/live-wallpaper"))
+-- hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("~/.local/bin/live-wallpaper stop"))
 hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd([[kitty --title "maintenance" sh -c "~/.local/bin/arch-maintenance.sh; read"]]))
 hl.bind(mainMod .. " + J", hl.dsp.exec_cmd("wl-kbptr-toggle"))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.exec_cmd("wl-kbptr-toggle right"))
@@ -58,23 +61,26 @@ hl.bind("ALT + Shift_L", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
 -- Drawer names come from `caelestia shell drawers list`.
 -- rofi (SUPER+R) and the old power-menu (SUPER+M) are deliberately left alone
 -- so there is a working fallback if quickshell is not running.
+-- caelestia-shell.service is not autostarted while impasto is the daily
+-- driver (see Startup section), so these drawer binds are dead keys with no
+-- caelestia equivalent left to map them to on impasto. Commented out instead
+-- of deleted: uncomment alongside the caelestia-launch revert in Startup.
 local cae = function(cmd) return hl.dsp.exec_cmd("caelestia shell " .. cmd) end
 local function open_launcher()
     hl.dispatch(hl.dsp.global("quickshell:launcher"))
     hl.dispatch(hl.dsp.exec_cmd("caelestia shell drawers toggle launcher"))
 end
 hl.bind(mainMod .. " + Space", open_launcher)
-hl.bind(mainMod .. " + SHIFT + D",     cae("drawers toggle dashboard"))
-hl.bind(mainMod .. " + SHIFT + N",     cae("drawers toggle sidebar"))
-hl.bind(mainMod .. " + SHIFT + U",     cae("drawers toggle utilities"))
-hl.bind(mainMod .. " + SHIFT + Escape", cae("drawers toggle session"))
-hl.bind(mainMod .. " + SHIFT + I",     cae("idleInhibitor toggle"))
-hl.bind(mainMod .. " + CTRL + N",      cae("notifs toggleDnd"))
+-- hl.bind(mainMod .. " + SHIFT + D",     cae("drawers toggle dashboard"))
+-- hl.bind(mainMod .. " + SHIFT + N",     cae("drawers toggle sidebar"))
+-- hl.bind(mainMod .. " + SHIFT + U",     cae("drawers toggle utilities"))
+-- hl.bind(mainMod .. " + SHIFT + Escape", cae("drawers toggle session"))
+-- hl.bind(mainMod .. " + SHIFT + I",     cae("idleInhibitor toggle"))
+-- hl.bind(mainMod .. " + CTRL + N",      cae("notifs toggleDnd"))
 
--- ── impasto shell (test, Quickshell global shortcuts) ───────────────────────
--- Only fires when a quickshell config that registers these names is running
--- (currently `qs -c impasto`, started manually, not at session start). No-op
--- when it isn't, since the portal has nothing registered under that name.
+-- ── impasto shell (daily driver, Quickshell global shortcuts) ───────────────
+-- impasto autostarts at login via impasto-launch (see Startup section), so
+-- these fire every session, not just when started manually.
 -- Kept off plain SUPER+<letter> entirely: that space already belongs to the
 -- binds above. Remove this block (or stop the impasto shell) to fully revert.
 -- Launcher is on plain SUPER+Space below (works for both shells), not here.
@@ -140,8 +146,9 @@ hl.bind(mainMod .. " + SHIFT + Tab", hl.dsp.window.cycle_next({ prev = true }))
 hl.bind(mainMod .. " + CTRL + Return", hl.dsp.window.center())
 -- Reload this config without logging out
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("hyprctl reload"))
--- Show/hide the bar
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("caelestia shell drawers toggle bar"))
+-- Show/hide the bar (caelestia CLI, dead while impasto is the daily driver;
+-- uncomment alongside the caelestia-launch revert in Startup)
+-- hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("caelestia shell drawers toggle bar"))
 
 -- ── Workspace switching / move window to workspace ───────────────────────────
 for i = 1, 10 do
@@ -340,8 +347,11 @@ end)
 -- when its own session-restore finishes creating them (observed: workspace
 -- 11, with nothing in this config targeting it there) instead of wherever it
 -- was opened. Forcing it to 1 makes placement deterministic regardless of
--- that race, same pattern as kitty-pad's scratchpad pin below.
-hl.window_rule({ match = { class = "^(zen)$" }, workspace = "1" })
+-- that race, same pattern as kitty-pad's scratchpad pin below. `silent` so
+-- opening a plain new Zen window while you're on another workspace doesn't
+-- yank focus away from what you're doing -- it only affects where the
+-- window itself lives, not which workspace you're looking at.
+hl.window_rule({ match = { class = "^(zen)$" }, workspace = "1 silent" })
 
 -- Terminal: no Hyprland-side transparency. kitty does its own via
 -- background_opacity in ~/.config/kitty/kitty.conf; the two multiply, so
