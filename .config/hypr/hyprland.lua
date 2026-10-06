@@ -205,11 +205,11 @@ hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"))
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"))
 
--- ── Screenshot ───────────────────────────────────────────────────────────────
-hl.bind(mainMod .. " + S",         hl.dsp.exec_cmd([[grim -g "$(slurp)" - | wl-copy]]))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd([[grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png]]))
--- Print key: region to both clipboard and disk
-hl.bind("Print", hl.dsp.exec_cmd([[sh -c 'f=~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png; grim -g "$(slurp)" "$f" && wl-copy < "$f"']]))
+-- ── Screenshot (Flicko Quickshell Ropes) ──────────────────────────────────
+hl.bind(mainMod .. " + S",         hl.dsp.global("quickshell:captureRegion"))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.global("quickshell:capture"))
+-- Print key: region capture (saves to Pictures and copies to clipboard)
+hl.bind("Print",                   hl.dsp.global("quickshell:captureRegion"))
 
 -- ── Clipboard history ────────────────────────────────────────────────────────
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy"))

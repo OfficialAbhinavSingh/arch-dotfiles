@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# flicko-screenshot: interactive physics screenshot tool with flicko/zephyr ropes
+set -euo pipefail
+
+MODE="${1:-region}"
+
+if pgrep -x qs >/dev/null 2>&1; then
+    case "$MODE" in
+        window|--window|-w)
+            hyprctl dispatch 'hl.dsp.global("quickshell:captureWindow")' >/dev/null 2>&1
+            ;;
+        screen|full|--screen|--full|-f)
+            hyprctl dispatch 'hl.dsp.global("quickshell:capture")' >/dev/null 2>&1
+            ;;
+        *)
+            hyprctl dispatch 'hl.dsp.global("quickshell:captureRegion")' >/dev/null 2>&1
+            ;;
+    esac
+else
+    # Quickshell standalone fallback
+    if [ -f "$HOME/.config/quickshell/flicko-screenshot/shell.qml" ]; then
+        quickshell -p "$HOME/.config/quickshell/flicko-screenshot/shell.qml"
+    else
+        # Slurp fallback
+        mkdir -p "$HOME/Pictures"
+        f="$HOME/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
+        grim -g "$(slurp)" "$f"
+        wl-copy < "$f"
+        notify-send -i "$f" "Screenshot" "Saved to Pictures and copied to clipboard"
+    fi
+fi
