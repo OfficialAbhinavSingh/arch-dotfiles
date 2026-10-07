@@ -89,6 +89,18 @@ fi
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 
+# zsh_history self-heal: a shell killed mid-write (hard poweroff, crash)
+# leaves NUL bytes -> "zsh: corrupt history file". Strip them before load.
+() {
+  local h="$HOME/.zsh_history"
+  if [[ -s $h ]] && LC_ALL=C command grep -qaP '\x00' "$h" 2>/dev/null; then
+    command cp -p "$h" "$h.corrupt-$(date +%Y%m%d%H%M%S)" &&
+      LC_ALL=C command tr -d '\000' < "$h" > "$h.tmp" &&
+      command chmod 600 "$h.tmp" && command mv -f "$h.tmp" "$h"
+  fi
+}
+setopt HIST_FCNTL_LOCK   # proper file locking with share_history
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
