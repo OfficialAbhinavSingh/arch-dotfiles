@@ -101,7 +101,7 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 }
 setopt HIST_FCNTL_LOCK   # proper file locking with share_history
 
-source $ZSH/oh-my-zsh.sh
+[[ -f $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
@@ -156,25 +156,25 @@ zle -N clear-and-ff
 bindkey '\el' clear-and-ff
  
 
-. "$HOME/.local/share/../bin/env"
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 alias gl="git log --graph --all --decorate --oneline --format=format:'%C(bold 141)%h%C(reset) - %C(cyan)(%ar)%C(reset) %C(white)%s%C(reset) %C(blue)- %an%C(reset)%C(bold 203)%d%C(reset)'"
 # >>> Codex installer >>>
-export PATH="/home/laterabhi/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 # <<< Codex installer <<<
 
-source /home/laterabhi/.daytona.completion_script.zsh
+[[ -f "$HOME/.daytona.completion_script.zsh" ]] && source "$HOME/.daytona.completion_script.zsh"
 
 # kimi-code
-export PATH="/home/laterabhi/.kimi-code/bin:$PATH"
+export PATH="$HOME/.kimi-code/bin:$PATH"
 alias cgc="~/.venvs/cgc/bin/cgc"
 
-source ~/.config/secret
+[[ -f ~/.config/secret ]] && source ~/.config/secret
 
 # bun completions
-[ -s "/home/laterabhi/.bun/_bun" ] && source "/home/laterabhi/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
@@ -188,10 +188,10 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#6c7086'
 export ENTIRE_TOKEN_STORE=file
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/home/laterabhi/google-cloud-sdk/path.zsh.inc' ]; then . '/home/laterabhi/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/home/laterabhi/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/laterabhi/google-cloud-sdk/completion.zsh.inc'; fi
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
 
 # ── impasto greeting ──────────────────────────────────────────────────────
 # fastfetch with the greeting scene chosen in quickshell's settings.
