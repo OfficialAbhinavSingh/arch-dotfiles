@@ -1,39 +1,60 @@
 # Arch Linux Laptop Dotfiles
 
-Personal configuration files for my Arch Linux laptop, primarily for Hyprland on Wayland. These files reflect one machine and are a starting point for another laptop, not a universal installer. Review and adapt each setting before applying it.
+Personal configuration files for my Arch Linux laptop: Hyprland (Lua config) on Wayland with the [impasto](https://github.com/andreumassanet/impasto) Quickshell desktop shell, kitty, zsh and Neovim.
 
-## Use on another laptop
+![Desktop](assets/screenshots/desktop.jpg)
 
-Clone the repository and inspect the files you want:
+| | |
+|---|---|
+| ![App launcher](assets/screenshots/launcher.jpg) | ![Wallpaper picker](assets/screenshots/appearance.jpg) |
+| App launcher | Wallpaper picker; the palette follows the wallpaper |
+| ![System statistics](assets/screenshots/stats.jpg) | ![Terminal](assets/screenshots/terminal.jpg) |
+| System statistics | kitty with the fastfetch greeting |
+
+Screenshots framed with [Screenshot Studio](https://github.com/opennookorg/screenshot-studio).
+
+## Install on any Arch machine
+
+On an Arch Linux install with `sudo` set up for your user, run as that user (not root):
 
 ```bash
-mkdir -p ~/Projects
-git clone https://github.com/OfficialAbhinavSingh/arch-dotfiles.git ~/Projects/arch-dotfiles
-cd ~/Projects/arch-dotfiles
-git ls-files
+git clone -b impasto-rice https://github.com/OfficialAbhinavSingh/arch-dotfiles.git ~/arch-dotfiles
+cd ~/arch-dotfiles
+./install.sh
 ```
 
-Back up any existing configuration before copying files. For example, to apply the Hyprland config:
+Then log out and run `start-hyprland` from a TTY, or pick Hyprland in your display manager.
 
-```bash
-backup="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
-mkdir -p "$backup" "$HOME/.config"
-if [ -e "$HOME/.config/hypr" ]; then
-    cp -a "$HOME/.config/hypr" "$backup/hypr"
-fi
-cp -a .config/hypr "$HOME/.config/"
-```
+`install.sh` does the following, and asks before anything that changes the system:
 
-Use the same approach for other selected files under `.config/`, plus `.bashrc`, `.zshrc`, or `.p10k.zsh` if you use those shells. Applying a whole config directory can replace files with the same names, so inspect the diff and keep the backup until everything works.
+- Installs the official packages the configs use with `pacman -Syu --needed`. This also updates the system.
+- Installs a few optional AUR packages: the cursor theme, Zen Browser, wallust, mpvpaper and wl-kbptr. It builds `yay` first if you have neither `yay` nor `paru`. An AUR build that fails is reported and skipped.
+- Copies the dotfiles into your home. Paths and the lock-screen name are rewritten for your user. Every file it replaces is moved to `~/.local/state/arch-dotfiles/backups/<timestamp>/` first.
+- Downloads impasto at the commit these configs were built against, adds this repo's changes to it, and copies its wallpapers and fonts into `~/.local/share`.
+- Installs oh-my-zsh, powerlevel10k and the two zsh plugins, and offers to make zsh your login shell.
+- Enables `power-profiles-daemon`, `bluetooth` and `NetworkManager`. NetworkManager is left alone if another network manager is already enabled.
+- On AMD laptops with an `amdgpu_bl1` backlight, it installs the fix in `system/` for a panel that stays black after boot.
 
-## Adapt before applying
+It is safe to run again. Useful options:
 
-- Replace `/home/laterabhi` paths with the account path on the target laptop. Wallpaper, avatar, and monitor settings also point to files or hardware from my machine.
-- The Hyprland setup expects its programs and plugins to be installed separately. Install the dependencies you need with pacman or an AUR helper before enabling related configs and services. This repository does not include a current package list or automatic installer.
-- `system/` contains system-wide source files, not files to copy into `$HOME`. Review them and install only the units that match the target hardware. The AMD backlight helper is specific to an `amdgpu_bl1` backlight device.
-- Do not copy `.gitconfig` as-is: set your own Git name, email, signing key, and credential helper.
-- `.config/zen/user.js` is a Zen Browser profile template. Place it in the active Zen profile only if you want those preferences.
-- See [MANUAL-INSTALLS.md](MANUAL-INSTALLS.md) for software installed outside pacman/AUR.
+| Option | Effect |
+|---|---|
+| `-n`, `--dry-run` | Show what would happen and change nothing |
+| `-y`, `--yes` | Don't ask; take the default answer everywhere |
+| `--skip-packages` | Copy configs only, install no packages |
+| `--skip-aur` | Official-repo packages only |
+| `--skip-system` | Don't touch system services or files outside your home |
+| `--no-chsh` | Keep your current login shell |
+
+To undo, copy the backup back: `cp -a ~/.local/state/arch-dotfiles/backups/<timestamp>/. ~/`.
+
+## What it does not set up
+
+- `monitors.lua` describes the original laptop's screens. Others get Hyprland's automatic layout. Edit it for your displays.
+- Right Alt is remapped to the backtick key by `.config/hypr/keymap-ralt-grave.xkb`. Remove the `kb_file` line in `hyprland.lua` if you don't want that.
+- `.gitconfig` is not installed. Set your own Git name, email and signing key.
+- `.claude/` (Claude Code settings) and `.config/zen/user.js` (a Zen Browser profile template) are not installed.
+- Tools installed outside pacman and the AUR are listed in [MANUAL-INSTALLS.md](MANUAL-INSTALLS.md).
 
 ## Credentials and privacy
 
