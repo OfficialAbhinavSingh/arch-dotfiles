@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # install.sh: set up this Arch + Hyprland + impasto desktop on any Arch machine.
 #
-#   git clone -b impasto-rice https://github.com/OfficialAbhinavSingh/arch-dotfiles.git
+#   git clone https://github.com/OfficialAbhinavSingh/arch-dotfiles.git
 #   cd arch-dotfiles && ./install.sh
 #
 # Run it as your normal user (it asks for sudo when it needs it). It is safe to
@@ -59,7 +59,7 @@ AUR_PKGS=(
 # Paths in this repo that are NOT copied into $HOME.
 SKIP_PATHS=(
     .git .gitignore .gitconfig README.md MANUAL-INSTALLS.md install.sh
-    system .claude .config/zen assets
+    system .claude .config/zen assets LICENSES
     .config/quickshell/impasto   # installed by install_impasto, on top of upstream
 )
 

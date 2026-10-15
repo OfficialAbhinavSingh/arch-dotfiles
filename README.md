@@ -18,7 +18,7 @@ Screenshots framed with [Screenshot Studio](https://github.com/opennookorg/scree
 On an Arch Linux install with `sudo` set up for your user, run as that user (not root):
 
 ```bash
-git clone -b impasto-rice https://github.com/OfficialAbhinavSingh/arch-dotfiles.git ~/arch-dotfiles
+git clone https://github.com/OfficialAbhinavSingh/arch-dotfiles.git ~/arch-dotfiles
 cd ~/arch-dotfiles
 ./install.sh
 ```
@@ -55,6 +55,14 @@ To undo, copy the backup back: `cp -a ~/.local/state/arch-dotfiles/backups/<time
 - `.gitconfig` is not installed. Set your own Git name, email and signing key.
 - `.claude/` (Claude Code settings) and `.config/zen/user.js` (a Zen Browser profile template) are not installed.
 - Tools installed outside pacman and the AUR are listed in [MANUAL-INSTALLS.md](MANUAL-INSTALLS.md).
+
+## Credits
+
+- **[impasto](https://github.com/andreumassanet/impasto)** by [Andreu Massanet Felix](https://github.com/andreumassanet) is the desktop shell: the bar, dynamic island, widgets, launcher, wallpaper picker and palette system in the screenshots all come from impasto. `install.sh` downloads it from the upstream repository at commit [`62b43a2`](https://github.com/andreumassanet/impasto/tree/62b43a2c9ee1b1c2a13e1c1b3c31d3ee51fc7e5f), along with its wallpapers and fonts. impasto is licensed under the GNU GPL v3.0. These files in this repository are modified copies of impasto files and stay under that license ([full text](LICENSES/impasto-GPL-3.0.txt)):
+  - `.config/quickshell/impasto/capture/CaptureOverlay.qml`
+  - `.config/quickshell/impasto/scripts/claude_usage.py`
+  - `.config/fastfetch/config.jsonc`
+- **[zephyr](https://github.com/flickowoa/zephyr)** by [flicko](https://github.com/flickowoa): the physics rope in the screenshot tool (`Rope.qml` under `.config/quickshell/`) is ported from its `quickshell/windows/Rope.qml`.
 
 ## Credentials and privacy
 

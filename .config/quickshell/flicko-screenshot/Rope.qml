@@ -1,3 +1,6 @@
+// Physics rope ported from flicko's zephyr dotfiles, quickshell/windows/Rope.qml
+// (https://github.com/flickowoa/zephyr). See Credits in README.md.
+
 import QtQuick
 import Quickshell
 import QtQuick.Shapes

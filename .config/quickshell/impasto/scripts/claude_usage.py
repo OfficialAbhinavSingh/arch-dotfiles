@@ -7,6 +7,7 @@
 # │   github.com/andreumassanet/impasto                                      │
 # │                                                                          │
 # ╰──────────────────────────────────────────────────────────────────────────╯
+# Modified from impasto by Andreu Massanet Felix (GPL-3.0); see Credits in README.md.
 
 """Report Claude Code usage from its transcripts and the API's rate limits.
 
