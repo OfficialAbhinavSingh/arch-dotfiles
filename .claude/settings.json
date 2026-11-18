@@ -7,7 +7,6 @@
       "mcp__playwright__*"
     ]
   },
-  "model": "opus",
   "fallbackModel": [
     "opus",
     "default"
@@ -70,11 +69,17 @@
     }
   },
   "effortLevel": "high",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "model": "opus"
 }

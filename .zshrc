@@ -1,3 +1,5 @@
+
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -141,7 +143,7 @@ if command -v starship >/dev/null 2>&1; then
 else
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 fi
-export BROWSER=zen
+export BROWSER=google-chrome-stable
 export PATH="$HOME/.local/bin:/opt/claude-code/bin:$PATH"
 alias dot='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
@@ -171,6 +173,8 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.kimi-code/bin:$PATH"
 alias cgc="~/.venvs/cgc/bin/cgc"
 
+# clear inherited value so commenting it out in ~/.config/secret takes effect
+unset CLAUDE_CODE_OAUTH_TOKEN
 [[ -f ~/.config/secret ]] && source ~/.config/secret
 
 # bun completions
@@ -215,3 +219,7 @@ function fa() {
         fastfetch "$@"
     fi
 }
+
+# Entire CLI shell completion
+autoload -Uz compinit && compinit && source <(entire completion zsh)
+export PATH="$PATH:$HOME/.config/.foundry/bin"

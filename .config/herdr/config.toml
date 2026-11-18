@@ -80,3 +80,6 @@ type = "popup"
 command = "lazygit"
 width = "90%"
 height = "90%"
+
+[ui]
+agent_panel_sort = "spaces"

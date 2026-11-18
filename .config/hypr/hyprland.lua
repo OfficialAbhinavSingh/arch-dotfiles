@@ -205,11 +205,13 @@ hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"))
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"))
 
--- ── Screenshot (Flicko Quickshell Ropes) ──────────────────────────────────
+-- ── Screenshot (Flicko Quickshell Ropes) & Search ─────────────────────────
 hl.bind(mainMod .. " + S",         hl.dsp.global("quickshell:captureRegion"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.global("quickshell:capture"))
 -- Print key: region capture (saves to Pictures and copies to clipboard)
 hl.bind("Print",                   hl.dsp.global("quickshell:captureRegion"))
+-- Gyotaku screenshot search
+hl.bind(mainMod .. " + G",         hl.dsp.exec_cmd("~/.local/bin/gyotaku-app"))
 
 -- ── Clipboard history ────────────────────────────────────────────────────────
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy"))
