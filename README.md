@@ -28,7 +28,8 @@ Then log out and run `start-hyprland` from a TTY, or pick Hyprland in your displ
 `install.sh` does the following, and asks before anything that changes the system:
 
 - Installs the official packages the configs use with `pacman -Syu --needed`. This also updates the system.
-- Installs a few optional AUR packages: the cursor theme, Zen Browser, wallust, mpvpaper and wl-kbptr. It builds `yay` first if you have neither `yay` nor `paru`. An AUR build that fails is reported and skipped.
+- Installs a few optional AUR packages: the cursor theme, Zen Browser, wallust and mpvpaper. It builds `yay` first if you have neither `yay` nor `paru`. An AUR build that fails is reported and skipped.
+- Builds wl-kbptr from the patched PKGBUILD in `pkgbuilds/`, because the AUR one does not build against OpenCV 5. It is rebuilt if an installed copy has lost its libraries. Every OpenCV update changes the library names, so if SUPER+J stops working after a system update, run `makepkg -fsi` in `pkgbuilds/wl-kbptr`.
 - Copies the dotfiles into your home. Paths and the lock-screen name are rewritten for your user. Every file it replaces is moved to `~/.local/state/arch-dotfiles/backups/<timestamp>/` first.
 - Downloads impasto at the commit these configs were built against, adds this repo's changes to it, and copies its wallpapers and fonts into `~/.local/share`.
 - Installs oh-my-zsh, powerlevel10k and the two zsh plugins, and offers to make zsh your login shell.

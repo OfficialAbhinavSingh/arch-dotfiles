@@ -53,13 +53,17 @@ AUR_PKGS=(
     zen-browser-bin            # $BROWSER
     wallust                    # rofi/waybar palettes (builds from source, slow)
     mpvpaper                   # animated wallpapers in impasto
-    wl-kbptr                   # SUPER+J keyboard pointer
+)
+# Built from the PKGBUILDs in pkgbuilds/ instead of the AUR, because the AUR
+# version does not build against the current Arch packages. Optional like AUR_PKGS.
+LOCAL_PKGS=(
+    wl-kbptr                   # SUPER+J keyboard pointer (AUR one breaks on OpenCV 5)
 )
 
 # Paths in this repo that are NOT copied into $HOME.
 SKIP_PATHS=(
     .git .gitignore .gitconfig README.md MANUAL-INSTALLS.md install.sh
-    system .claude .config/zen assets LICENSES
+    system .claude .config/zen assets LICENSES pkgbuilds
     .config/quickshell/impasto   # installed by install_impasto, on top of upstream
 )
 
@@ -201,6 +205,31 @@ install_aur() {
     for p in "${AUR_PKGS[@]}"; do
         if pacman -Qq "$p" >/dev/null 2>&1; then ok "$p (already installed)"; continue; fi
         if run "$AUR_HELPER" "${flags[@]}" "$p"; then ok "$p"; else warn "AUR package $p failed to build; skipped"; fi
+    done
+}
+# A package linked against a library soname that an update removed still shows
+# as installed but dies at exec; treat it as missing so it gets rebuilt.
+local_pkg_ok() {   # local_pkg_ok NAME
+    pacman -Qq "$1" >/dev/null 2>&1 || return 1
+    local f
+    while read -r f; do
+        [[ -f $f && -x $f ]] || continue
+        [[ $(ldd "$f" 2>/dev/null) == *"not found"* ]] && return 1
+    done < <(pacman -Qlq "$1" | grep '^/usr/bin/[^/]*$')
+    return 0
+}
+install_local_pkgs() {
+    step "Building patched packages from pkgbuilds/ (optional)"
+    # no --needed: a broken copy has the same version and must be reinstalled
+    local p flags=(-si)
+    ((YES)) && flags+=(--noconfirm)
+    for p in "${LOCAL_PKGS[@]}"; do
+        if local_pkg_ok "$p"; then ok "$p (already installed)"; continue; fi
+        # build in a scratch copy so src/, pkg/ and the package stay out of the repo
+        run cp -r "$REPO/pkgbuilds/$p" "$WORK/$p" || { warn "$p: no PKGBUILD in pkgbuilds/; skipped"; continue; }
+        if ((DRY)); then info "[dry-run] makepkg ${flags[*]} in $WORK/$p"; continue; fi
+        # -f: rebuild over an installed copy whose libraries went missing
+        if (cd "$WORK/$p" && makepkg -f "${flags[@]}"); then ok "$p"; else warn "$p failed to build; skipped"; fi
     done
 }
 
@@ -394,6 +423,7 @@ setup_services() {
 if ((!SKIP_PACKAGES)); then
     install_packages
     ((SKIP_AUR)) || install_aur
+    ((SKIP_AUR)) || install_local_pkgs
 fi
 install_dotfiles
 ((SKIP_IMPASTO)) || install_impasto

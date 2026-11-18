@@ -1,0 +1,37 @@
+# Maintainer: Clément Martinez <me at moverest dot xyz>
+pkgname=wl-kbptr
+pkgver=0.4.1
+pkgrel=3
+url="https://github.com/moverest/wl-kbptr"
+pkgdesc="Control the mouse pointer with the keyboard on Wayland"
+arch=('x86_64' 'aarch64')
+license=('GPL-3.0')
+depends=('cairo' 'wayland' 'libxkbcommon' 'opencv' 'pixman')
+makedepends=('meson' 'wayland-protocols')
+source=("https://github.com/moverest/wl-kbptr/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('03ac52afa42d7aa88f909f96b2c0e57f5706a11d5d0ff451f6052927571e0624')
+
+prepare() {
+    cd "$pkgname-$pkgver"
+
+    # OpenCV 5 ships opencv5.pc instead of opencv4.pc. Try the new name first
+    # and keep opencv4 as a fallback so the PKGBUILD stays usable on both.
+    sed -i "s/dependency('opencv4')/dependency(['opencv5', 'opencv4'])/" meson.build
+
+    # OpenCV 5 moved the shape functions (cv::boundingRect and friends) out of
+    # imgproc and into the new geometry module.
+    sed -i '/#include <opencv2\/imgproc.hpp>/a #if __has_include(<opencv2\/geometry.hpp>)\n#include <opencv2\/geometry.hpp>\n#endif' src/target_detection.cpp
+}
+
+build() {
+    arch-meson "$pkgname-$pkgver" build -Dopencv=enabled
+    ninja -C build
+}
+
+package() {
+    DESTDIR="$pkgdir" ninja -C build install
+    cd "$pkgname-$pkgver"
+    install -Dm 0755 helpers/wl-kbptr-sway-active-win -t "$pkgdir/usr/bin/"
+    install -Dm 0644 LICENSE -t "$pkgdir/usr/share/licenses/wl-kbptr/"
+    install -Dm 0644 README.md -t "$pkgdir/usr/share/doc/wl-kbptr/"
+}
